@@ -262,9 +262,12 @@ function loadPlants() {
 
         plants = data;
 
-        console.log(
-            `🌱 Loaded ${plants.length} plants.`
-        );
+        // Đồng bộ reference sau khi reload
+        module.exports.plants = plants;
+
+            console.log(
+         `🌱 Loaded ${plants.length} plants.`
+        );      
 
     } catch (error) {
 
@@ -1323,6 +1326,9 @@ function validatePlants() {
 function reloadPlants() {
 
     loadPlants();
+
+    // Cập nhật reference cho module.exports
+    module.exports.plants = plants;
 
     return plants;
 }
