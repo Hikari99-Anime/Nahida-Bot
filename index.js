@@ -2096,113 +2096,55 @@ function mainButtons() {
 // ============================================================
 
 function farmButtons() {
-
     return [
-
         new ActionRowBuilder()
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_plant"
-                    )
-                    .setLabel(
-                        "Gieo hạt"
-                    )
-                    .setEmoji(
-                        "🌱"
-                    )
-                    .setStyle(
-                        ButtonStyle.Success
-                    ),
+                    .setCustomId("farm_plant")
+                    .setLabel("Gieo hạt")
+                    .setEmoji("🌱")
+                    .setStyle(ButtonStyle.Success),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_water"
-                    )
-                    .setLabel(
-                        "Tưới nước"
-                    )
-                    .setEmoji(
-                        "💧"
-                    )
-                    .setStyle(
-                        ButtonStyle.Primary
-                    ),
+                    .setCustomId("farm_water")
+                    .setLabel("Tưới nước")
+                    .setEmoji("💧")
+                    .setStyle(ButtonStyle.Primary),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_harvest"
-                    )
-                    .setLabel(
-                        "Thu hoạch"
-                    )
-                    .setEmoji(
-                        "🌾"
-                    )
-                    .setStyle(
-                        ButtonStyle.Success
-                    ),
+                    .setCustomId("farm_harvest")
+                    .setLabel("Thu hoạch")
+                    .setEmoji("🌾")
+                    .setStyle(ButtonStyle.Success),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_bug"
-                    )
-                    .setLabel(
-                        "Bắt sâu"
-                    )
-                    .setEmoji(
-                        "🐛"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    )
+                    .setCustomId("farm_bug")
+                    .setLabel("Bắt sâu")
+                    .setEmoji("🐛")
+                    .setStyle(ButtonStyle.Secondary)
             ),
 
         new ActionRowBuilder()
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_profile"
-                    )
-                    .setLabel(
-                        "Hồ sơ"
-                    )
-                    .setEmoji(
-                        "👤"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    ),
+                    .setCustomId("home_profile")
+                    .setLabel("Hồ sơ")
+                    .setEmoji("👤")
+                    .setStyle(ButtonStyle.Secondary),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_inventory"
-                    )
-                    .setLabel(
-                        "Túi đồ"
-                    )
-                    .setEmoji(
-                        "🎒"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    ),
+                    .setCustomId("home_inventory")
+                    .setLabel("Túi đồ")
+                    .setEmoji("🎒")
+                    .setStyle(ButtonStyle.Secondary),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home"
-                    )
-                    .setLabel(
-                        "Trang chủ"
-                    )
-                    .setEmoji(
-                        "🏠"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    )
+                    .setCustomId("home")
+                    .setLabel("Trang chủ")
+                    .setEmoji("🏠")
+                    .setStyle(ButtonStyle.Secondary)
             )
     ];
 }
