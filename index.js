@@ -856,7 +856,33 @@ function inventoryEmbed(user) {
         color: COLORS.gold
     });
 }
+// ============================================================
+// SEED PRICE
+// ============================================================
 
+function getSeedPrice(plant) {
+
+    if (!plant) return 50;
+
+    const customPrice =
+        Number(plant.seedPrice);
+
+    if (
+        Number.isFinite(customPrice) &&
+        customPrice > 0
+    ) {
+        return Math.floor(customPrice);
+    }
+
+    // Giá mặc định nếu plants.json chưa có seedPrice
+    const rarity =
+        Math.max(
+            1,
+            Number(plant.rarity) || 1
+        );
+
+    return rarity * 50;
+}
 // ============================================================
 // SHOP EMBED
 // ============================================================
