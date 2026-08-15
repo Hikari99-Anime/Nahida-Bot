@@ -132,7 +132,31 @@ CREATE TABLE IF NOT EXISTS bred_plants (
 // ============================================================
 
 const PREFIX = "n";
+// ============================================================
+// ADMIN
+// ============================================================
 
+const ADMIN_ID =
+    process.env.ADMIN_ID || "";
+
+function isAdmin(user) {
+
+    if (!ADMIN_ID) {
+        return false;
+    }
+
+    return String(user.id) ===
+        String(ADMIN_ID);
+}
+
+function adminOnly(interactionOrMessage) {
+
+    const user =
+        interactionOrMessage.user ||
+        interactionOrMessage.author;
+
+    return isAdmin(user);
+}
 const COLORS = {
     green: 0x78C850,
     dendro: 0x6FBF4A,
@@ -4782,7 +4806,35 @@ function helpEmbed(
 // ============================================================
 // MESSAGE COMMANDS
 // ============================================================
+// ============================================================
+// ADMIN HELPERS
+// ============================================================
 
+function getMentionedUser(message) {
+
+    return (
+        message.mentions.users.first() ||
+        null
+    );
+}
+
+function adminError(message) {
+
+    return message.reply({
+        content:
+            "❌ Bạn không có quyền sử dụng lệnh Admin."
+    });
+}
+
+function adminTargetError(message) {
+
+    return message.reply({
+        content:
+            "❌ Hãy mention người chơi cần chỉnh.\n\n" +
+            "Ví dụ:\n" +
+            "`nadmin mora @user 10000`"
+    });
+}
 client.on(
     "messageCreate",
     async message => {
@@ -5075,7 +5127,55 @@ client.on(
 
                     break;
                 }
+// ====================================================
+// ADMIN
+// ====================================================
 
+case "admin": {
+
+    if (!isAdmin(message.author)) {
+
+        await message.reply({
+            content:
+                "❌ Bạn không có quyền sử dụng lệnh Admin."
+        });
+
+        break;
+    }
+
+    await message.reply({
+
+        embeds: [
+
+            farmEmbed({
+
+                user:
+                    message.author,
+
+                title:
+                    "⚙️ Admin Panel",
+
+                description:
+                    [
+                        "🔐 **ADMIN MODE**",
+                        "",
+                        "> `nadmin shop` — đổi shop của người dùng",
+                        "> `nadmin mora @user 10000` — thêm Mora",
+                        "> `nadmin seed @user windwheel 10` — thêm hạt",
+                        "> `nadmin xp @user 100` — thêm EXP",
+                        "> `nadmin water @user 100` — thêm nước",
+                        "> `nadmin resetshop @user` — reset shop",
+                        "> `nadmin resetuser @user` — reset dữ liệu user"
+                    ].join("\n"),
+
+                color:
+                    COLORS.red
+            })
+        ]
+    });
+
+    break;
+}
                 case "nplant": {
 
                     const plant =
