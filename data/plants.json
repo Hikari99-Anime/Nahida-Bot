@@ -1,0 +1,526 @@
+[
+  {
+    "id": "sweet_flower",
+    "name": "Sweet Flower",
+    "nameVi": "Hoa Ngọt",
+    "emoji": "🌼",
+    "region": "Mondstadt",
+    "rarity": 1,
+    "growthTime": 300,
+    "waterCost": 10,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 8,
+    "farmXP": 5,
+    "profileXP": 3,
+    "color": "yellow",
+    "genes": {
+      "growth": 40,
+      "yield": 45,
+      "water": 50,
+      "rarity": 20,
+      "mutation": 10
+    },
+    "mutations": [
+      "golden",
+      "shiny"
+    ],
+    "unlockLevel": 1,
+    "description": "Một loài hoa có hương thơm ngọt ngào."
+  },
+
+  {
+    "id": "mint",
+    "name": "Mint",
+    "nameVi": "Bạc Hà",
+    "emoji": "🌿",
+    "region": "Mondstadt",
+    "rarity": 1,
+    "growthTime": 360,
+    "waterCost": 10,
+    "yield": {
+      "min": 2,
+      "max": 5
+    },
+    "sellPrice": 7,
+    "farmXP": 6,
+    "profileXP": 3,
+    "color": "green",
+    "genes": {
+      "growth": 50,
+      "yield": 50,
+      "water": 60,
+      "rarity": 15,
+      "mutation": 15
+    },
+    "mutations": [
+      "shiny",
+      "lunar"
+    ],
+    "unlockLevel": 1,
+    "description": "Một loại thảo mộc có màu xanh mát."
+  },
+
+  {
+    "id": "valberry",
+    "name": "Valberry",
+    "nameVi": "Quả Nhật Lạc",
+    "emoji": "🍓",
+    "region": "Mondstadt",
+    "rarity": 2,
+    "growthTime": 600,
+    "waterCost": 15,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 18,
+    "farmXP": 12,
+    "profileXP": 6,
+    "color": "red",
+    "genes": {
+      "growth": 45,
+      "yield": 55,
+      "water": 40,
+      "rarity": 35,
+      "mutation": 25
+    },
+    "mutations": [
+      "golden",
+      "rainbow"
+    ],
+    "unlockLevel": 5,
+    "description": "Một loại quả đỏ mọng thường mọc thành bụi."
+  },
+
+  {
+    "id": "cecilia",
+    "name": "Cecilia",
+    "nameVi": "Cecilia",
+    "emoji": "🌸",
+    "region": "Mondstadt",
+    "rarity": 3,
+    "growthTime": 900,
+    "waterCost": 20,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 45,
+    "farmXP": 22,
+    "profileXP": 10,
+    "color": "white",
+    "genes": {
+      "growth": 35,
+      "yield": 35,
+      "water": 35,
+      "rarity": 70,
+      "mutation": 55
+    },
+    "mutations": [
+      "shiny",
+      "lunar",
+      "crystal"
+    ],
+    "unlockLevel": 10,
+    "description": "Một loài hoa thanh khiết mọc trên những vùng đất cao."
+  },
+
+  {
+    "id": "windwheel_aster",
+    "name": "Windwheel Aster",
+    "nameVi": "Phong Xa Cúc",
+    "emoji": "🌺",
+    "region": "Mondstadt",
+    "rarity": 3,
+    "growthTime": 840,
+    "waterCost": 18,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 40,
+    "farmXP": 20,
+    "profileXP": 9,
+    "color": "red",
+    "genes": {
+      "growth": 60,
+      "yield": 50,
+      "water": 45,
+      "rarity": 60,
+      "mutation": 45
+    },
+    "mutations": [
+      "golden",
+      "rainbow"
+    ],
+    "unlockLevel": 10,
+    "description": "Loài hoa giống như bánh xe đang xoay theo gió."
+  },
+
+  {
+    "id": "qingxin",
+    "name": "Qingxin",
+    "nameVi": "Thanh Tâm",
+    "emoji": "💠",
+    "region": "Liyue",
+    "rarity": 4,
+    "growthTime": 1500,
+    "waterCost": 25,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 80,
+    "farmXP": 38,
+    "profileXP": 18,
+    "color": "white",
+    "genes": {
+      "growth": 30,
+      "yield": 30,
+      "water": 40,
+      "rarity": 85,
+      "mutation": 70
+    },
+    "mutations": [
+      "shiny",
+      "crystal",
+      "lunar"
+    ],
+    "unlockLevel": 20,
+    "description": "Một bông hoa trắng tinh khiết thường mọc trên núi cao."
+  },
+
+  {
+    "id": "silk_flower",
+    "name": "Silk Flower",
+    "nameVi": "Hoa Lụa",
+    "emoji": "🌹",
+    "region": "Liyue",
+    "rarity": 3,
+    "growthTime": 1080,
+    "waterCost": 20,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 55,
+    "farmXP": 28,
+    "profileXP": 12,
+    "color": "red",
+    "genes": {
+      "growth": 50,
+      "yield": 65,
+      "water": 45,
+      "rarity": 65,
+      "mutation": 50
+    },
+    "mutations": [
+      "golden",
+      "shiny"
+    ],
+    "unlockLevel": 15,
+    "description": "Một loài hoa đỏ mềm mại như lụa."
+  },
+
+  {
+    "id": "violetgrass",
+    "name": "Violetgrass",
+    "nameVi": "Tử Uyển",
+    "emoji": "💜",
+    "region": "Liyue",
+    "rarity": 4,
+    "growthTime": 1320,
+    "waterCost": 22,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 72,
+    "farmXP": 34,
+    "profileXP": 16,
+    "color": "purple",
+    "genes": {
+      "growth": 40,
+      "yield": 35,
+      "water": 55,
+      "rarity": 80,
+      "mutation": 65
+    },
+    "mutations": [
+      "lunar",
+      "crystal",
+      "shiny"
+    ],
+    "unlockLevel": 20,
+    "description": "Một loài hoa tím thường mọc trên vách núi."
+  },
+
+  {
+    "id": "naku_weed",
+    "name": "Naku Weed",
+    "nameVi": "Cỏ Naku",
+    "emoji": "🌿",
+    "region": "Inazuma",
+    "rarity": 3,
+    "growthTime": 1200,
+    "waterCost": 25,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 60,
+    "farmXP": 30,
+    "profileXP": 14,
+    "color": "purple",
+    "genes": {
+      "growth": 55,
+      "yield": 55,
+      "water": 30,
+      "rarity": 60,
+      "mutation": 60
+    },
+    "mutations": [
+      "lunar",
+      "shiny"
+    ],
+    "unlockLevel": 25,
+    "description": "Một loại cây phát triển trong môi trường có sấm sét."
+  },
+
+  {
+    "id": "sakura_bloom",
+    "name": "Sakura Bloom",
+    "nameVi": "Anh Đào Tím",
+    "emoji": "🌸",
+    "region": "Inazuma",
+    "rarity": 5,
+    "growthTime": 1800,
+    "waterCost": 30,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 120,
+    "farmXP": 55,
+    "profileXP": 25,
+    "color": "pink",
+    "genes": {
+      "growth": 45,
+      "yield": 30,
+      "water": 50,
+      "rarity": 95,
+      "mutation": 90
+    },
+    "mutations": [
+      "shiny",
+      "lunar",
+      "rainbow",
+      "crystal"
+    ],
+    "unlockLevel": 35,
+    "description": "Những cánh hoa màu tím đặc biệt gắn liền với Inazuma."
+  },
+
+  {
+    "id": "dendrobium",
+    "name": "Dendrobium",
+    "nameVi": "Dendrobium",
+    "emoji": "🌺",
+    "region": "Inazuma",
+    "rarity": 4,
+    "growthTime": 1440,
+    "waterCost": 28,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 90,
+    "farmXP": 42,
+    "profileXP": 20,
+    "color": "red",
+    "genes": {
+      "growth": 60,
+      "yield": 60,
+      "water": 40,
+      "rarity": 75,
+      "mutation": 70
+    },
+    "mutations": [
+      "golden",
+      "shiny",
+      "rainbow"
+    ],
+    "unlockLevel": 30,
+    "description": "Một loài hoa đỏ rực rỡ thường mọc ở vùng đất có chiến tranh."
+  },
+
+  {
+    "id": "nilotpala_lotus",
+    "name": "Nilotpala Lotus",
+    "nameVi": "Sen Nilotpala",
+    "emoji": "🪷",
+    "region": "Sumeru",
+    "rarity": 5,
+    "growthTime": 2100,
+    "waterCost": 30,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 135,
+    "farmXP": 62,
+    "profileXP": 28,
+    "color": "blue",
+    "genes": {
+      "growth": 50,
+      "yield": 35,
+      "water": 80,
+      "rarity": 98,
+      "mutation": 92
+    },
+    "mutations": [
+      "lunar",
+      "crystal",
+      "rainbow"
+    ],
+    "unlockLevel": 40,
+    "description": "Một đóa sen xanh phát sáng dưới ánh trăng."
+  },
+
+  {
+    "id": "padisarah",
+    "name": "Padisarah",
+    "nameVi": "Padisarah",
+    "emoji": "🌷",
+    "region": "Sumeru",
+    "rarity": 5,
+    "growthTime": 1950,
+    "waterCost": 28,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 150,
+    "farmXP": 65,
+    "profileXP": 30,
+    "color": "purple",
+    "genes": {
+      "growth": 55,
+      "yield": 40,
+      "water": 65,
+      "rarity": 99,
+      "mutation": 95
+    },
+    "mutations": [
+      "golden",
+      "shiny",
+      "rainbow",
+      "lunar"
+    ],
+    "unlockLevel": 45,
+    "description": "Một loài hoa quý hiếm mang vẻ đẹp thanh tao của Sumeru."
+  },
+
+  {
+    "id": "mourning_flower",
+    "name": "Mourning Flower",
+    "nameVi": "Hoa Bi Ai",
+    "emoji": "🥀",
+    "region": "Sumeru",
+    "rarity": 4,
+    "growthTime": 1650,
+    "waterCost": 26,
+    "yield": {
+      "min": 1,
+      "max": 4
+    },
+    "sellPrice": 100,
+    "farmXP": 48,
+    "profileXP": 22,
+    "color": "red",
+    "genes": {
+      "growth": 45,
+      "yield": 55,
+      "water": 60,
+      "rarity": 82,
+      "mutation": 78
+    },
+    "mutations": [
+      "lunar",
+      "crystal",
+      "shiny"
+    ],
+    "unlockLevel": 35,
+    "description": "Một loài hoa có thể phát triển ở vùng đất khắc nghiệt."
+  },
+
+  {
+    "id": "lumidouce_bell",
+    "name": "Lumidouce Bell",
+    "nameVi": "Chuông Lumidouce",
+    "emoji": "🔔",
+    "region": "Fontaine",
+    "rarity": 4,
+    "growthTime": 1500,
+    "waterCost": 24,
+    "yield": {
+      "min": 2,
+      "max": 4
+    },
+    "sellPrice": 105,
+    "farmXP": 50,
+    "profileXP": 23,
+    "color": "purple",
+    "genes": {
+      "growth": 65,
+      "yield": 65,
+      "water": 70,
+      "rarity": 78,
+      "mutation": 75
+    },
+    "mutations": [
+      "shiny",
+      "crystal",
+      "rainbow"
+    ],
+    "unlockLevel": 50,
+    "description": "Một loài hoa hình chuông mang sắc tím dịu dàng."
+  },
+
+  {
+    "id": "lakelight_lily",
+    "name": "Lakelight Lily",
+    "nameVi": "Lily Ánh Hồ",
+    "emoji": "🪷",
+    "region": "Fontaine",
+    "rarity": 5,
+    "growthTime": 2400,
+    "waterCost": 35,
+    "yield": {
+      "min": 1,
+      "max": 3
+    },
+    "sellPrice": 180,
+    "farmXP": 75,
+    "profileXP": 35,
+    "color": "blue",
+    "genes": {
+      "growth": 50,
+      "yield": 30,
+      "water": 95,
+      "rarity": 100,
+      "mutation": 98
+    },
+    "mutations": [
+      "lunar",
+      "crystal",
+      "rainbow",
+      "shiny"
+    ],
+    "unlockLevel": 60,
+    "description": "Một loài hoa quý hiếm gắn liền với những hồ nước trong xanh."
+  }
+]

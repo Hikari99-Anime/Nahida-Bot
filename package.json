@@ -1,19 +1,16 @@
 {
-  "name": "nahida-bot",
+  "name": "nahida-farm",
   "version": "1.0.0",
-  "description": "NahidaFarm Discord Bot",
-  "main": "src/index.js",
+  "description": "Nahida Farm Discord Bot",
+  "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "deploy": "node src/deploy-commands.js"
+    "start": "node index.js",
+    "dev": "node --watch index.js"
   },
   "dependencies": {
-    "better-sqlite3": "^12.0.0",
-    "discord.js": "^14.0.0",
-    "dotenv": "^17.4.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.0"
+    "better-sqlite3": "^12.4.1",
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.2"
   }
 }
