@@ -863,15 +863,11 @@ function inventoryEmbed(user) {
 
 function shopEmbed(user) {
 
-    const data =
-        getUser(user);
+    const data = getUser(user);
 
-    const plants =
-        plantDatabase
-            .getAvailablePlants(
-                data.level
-            )
-            .slice(0, 10);
+    const plants = plantDatabase
+        .getAvailablePlants(data.level)
+        .slice(0, 25);
 
     const lines = [];
 
@@ -882,30 +878,53 @@ function shopEmbed(user) {
     lines.push("");
 
     lines.push(
-        `💰 Mora: **${data.mora.toLocaleString()}**`
+        `💰 **Mora:** ${data.mora.toLocaleString()}`
     );
 
     lines.push("");
 
-    lines.push("🌱 **HẠT GIỐNG**");
-
-    for (const plant of plants) {
-
-        const price =
-            Number(
-                plant.seedPrice
-            ) || 0;
-
-        const growth =
-            plantGrowth(plant);
+    if (!plants.length) {
 
         lines.push(
-            `> ${plantEmoji(plant)} **${plantName(plant)}**`
+            "> 🌱 Hiện chưa có hạt giống nào được mở khóa."
         );
 
-        lines.push(
-            `> 💰 ${price.toLocaleString()} • ⏱️ ${formatTime(growth)}`
-        );
+    } else {
+
+        lines.push("🌱 **HẠT GIỐNG**");
+        lines.push("");
+
+        for (const plant of plants) {
+
+            const price =
+                Math.max(
+                    0,
+                    Number(plant.seedPrice) || 0
+                );
+
+            const growth =
+                plantGrowth(plant);
+
+            const owned =
+                getItemCount(
+                    user.id,
+                    plant.id
+                );
+
+            lines.push(
+                `${plantEmoji(plant)} **${plantName(plant)}**`
+            );
+
+            lines.push(
+                `> 💰 ${price.toLocaleString()} Mora • ⏱️ ${formatTime(growth)}`
+            );
+
+            lines.push(
+                `> 🎒 Đang có: **${owned}**`
+            );
+
+            lines.push("");
+        }
     }
 
     return farmEmbed({
@@ -915,7 +934,89 @@ function shopEmbed(user) {
         color: COLORS.gold
     });
 }
+// ============================================================
+// SHOP SELECT MENU
+// ============================================================
 
+function shopSelectMenu(user) {
+
+    const data =
+        getUser(user);
+
+    const plants =
+        plantDatabase
+            .getAvailablePlants(data.level)
+            .slice(0, 25);
+
+    if (!plants.length) {
+        return null;
+    }
+
+    const options =
+        plants.map(plant => {
+
+            const price =
+                Math.max(
+                    0,
+                    Number(plant.seedPrice) || 0
+                );
+
+            const owned =
+                getItemCount(
+                    user.id,
+                    plant.id
+                );
+
+            return {
+
+                label:
+                    `${plantEmoji(plant)} ${plantName(plant)}`
+                        .slice(0, 100),
+
+                description:
+                    `${price.toLocaleString()} Mora • Đang có: ${owned}`
+                        .slice(0, 100),
+
+                value:
+                    plant.id
+            };
+        });
+
+    const menu =
+        new StringSelectMenuBuilder()
+            .setCustomId("shop_buy")
+            .setPlaceholder(
+                "🛒 Chọn hạt giống muốn mua..."
+            )
+            .addOptions(options);
+
+    return [
+        new ActionRowBuilder()
+            .addComponents(menu),
+
+        new ActionRowBuilder()
+            .addComponents(
+
+                new ButtonBuilder()
+                    .setCustomId("home_farm")
+                    .setLabel("Nông trại")
+                    .setEmoji("🌱")
+                    .setStyle(ButtonStyle.Success),
+
+                new ButtonBuilder()
+                    .setCustomId("home_inventory")
+                    .setLabel("Túi đồ")
+                    .setEmoji("🎒")
+                    .setStyle(ButtonStyle.Secondary),
+
+                new ButtonBuilder()
+                    .setCustomId("home")
+                    .setLabel("Trang chủ")
+                    .setEmoji("🏠")
+                    .setStyle(ButtonStyle.Secondary)
+            )
+    ];
+}
 // ============================================================
 // PLANT DETAIL
 // ============================================================
@@ -1325,25 +1426,52 @@ async function buyPlant(
 
         return interaction.reply({
             content:
-                "❌ Không tìm thấy cây.",
+                "❌ Không tìm thấy hạt giống.",
+            ephemeral: true
+        });
+    }
+
+    // Kiểm tra level
+    if (
+        typeof plant.unlockLevel !== "undefined" &&
+        user.level <
+        Number(plant.unlockLevel)
+    ) {
+
+        return interaction.reply({
+            content:
+                `🔒 Bạn cần **Lv.${plant.unlockLevel}** để mua hạt giống này.`,
             ephemeral: true
         });
     }
 
     const price =
-        Number(
-            plant.seedPrice
-        ) || 0;
+        Math.max(
+            0,
+            Number(plant.seedPrice) || 0
+        );
+
+    if (price <= 0) {
+
+        return interaction.reply({
+            content:
+                `❌ Hạt giống **${plantName(plant)}** chưa được thiết lập giá trong \`plants.json\`.`,
+            ephemeral: true
+        });
+    }
 
     if (user.mora < price) {
 
         return interaction.reply({
             content:
-                `❌ Bạn cần **${price.toLocaleString()} Mora**.`,
+                `❌ Bạn không đủ Mora.\n\n` +
+                `💰 Giá: **${price.toLocaleString()} Mora**\n` +
+                `💰 Bạn có: **${user.mora.toLocaleString()} Mora**`,
             ephemeral: true
         });
     }
 
+    // Trừ Mora
     updateUser(
         interaction.user.id,
         {
@@ -1352,26 +1480,53 @@ async function buyPlant(
         }
     );
 
+    // Thêm hạt vào túi
     addItem(
         interaction.user.id,
         plant.id,
         1
     );
 
-    await interaction.reply({
+    const newUser =
+        getUser(
+            interaction.user
+        );
+
+    const owned =
+        getItemCount(
+            interaction.user.id,
+            plant.id
+        );
+
+    await interaction.update({
         embeds: [
             farmEmbed({
-                user: interaction.user,
-                title: "Mua Hạt Giống",
+                user:
+                    interaction.user,
+
+                title:
+                    "Mua Hạt Giống",
+
                 description:
                     `${plantEmoji(plant)} **${plantName(plant)}**\n\n` +
-                    `> Đã mua **×1**\n` +
-                    `> 💰 -${price.toLocaleString()} Mora`,
-                color: COLORS.gold
+
+                    `> 🌱 Đã mua: **×1**\n` +
+
+                    `> 🎒 Trong túi: **×${owned}**\n` +
+
+                    `> 💰 -${price.toLocaleString()} Mora\n` +
+
+                    `> 💰 Còn lại: **${newUser.mora.toLocaleString()} Mora**`,
+
+                color:
+                    COLORS.gold
             })
         ],
-        components: backButton(),
-        ephemeral: true
+
+        components:
+            shopSelectMenu(
+                interaction.user
+            ) || backButton()
     });
 }
 
@@ -2178,19 +2333,23 @@ client.on(
 
                     break;
 
-                case "shop":
+               case "shop":
 
-                    await message.reply({
-                        embeds: [
-                            shopEmbed(
-                                message.author
-                            )
-                        ],
-                        components:
-                            mainButtons()
-                    });
+    await message.reply({
 
-                    break;
+        embeds: [
+            shopEmbed(
+                message.author
+            )
+        ],
+
+        components:
+            shopSelectMenu(
+                message.author
+            ) || backButton()
+    });
+
+    break;
 
                 case "genetics":
                 case "genes":
@@ -2544,19 +2703,22 @@ client.on(
                         mainButtons()
                 });
             }
+if (id === "home_shop") {
 
-            if (id === "home_shop") {
+    return interaction.update({
 
-                return interaction.update({
-                    embeds: [
-                        shopEmbed(
-                            interaction.user
-                        )
-                    ],
-                    components:
-                        mainButtons()
-                });
-            }
+        embeds: [
+            shopEmbed(
+                interaction.user
+            )
+        ],
+
+        components:
+            shopSelectMenu(
+                interaction.user
+            ) || backButton()
+    });
+}
 
             if (id === "home_genetics") {
 
