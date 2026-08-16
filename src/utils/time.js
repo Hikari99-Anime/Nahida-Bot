@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // TIME
 // ============================================================
 
@@ -59,17 +59,17 @@ function formatTime(seconds) {
 
     if (h > 0) {
 
-        return `${h} giá» ${m} phÃºt`;
+        return `${h} giờ ${m} phút`;
 
     }
 
     if (m > 0) {
 
-        return `${m} phÃºt ${s} giÃ¢y`;
+        return `${m} phút ${s} giây`;
 
     }
 
-    return `${s} giÃ¢y`;
+    return `${s} giây`;
 }
 
 module.exports = {
@@ -78,4 +78,3 @@ module.exports = {
     getDayKey,
     formatTime
 };
-

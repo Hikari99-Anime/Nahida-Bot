@@ -1,4 +1,4 @@
-﻿const Database = require("better-sqlite3");
+const Database = require("better-sqlite3");
 const path = require("path");
 
 // ============================================================
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS bred_plants (
     parent_b TEXT NOT NULL,
     name TEXT NOT NULL,
     name_vi TEXT,
-    emoji TEXT DEFAULT 'ðŸŒ±',
+    emoji TEXT DEFAULT '🌱',
     growth_time INTEGER DEFAULT 60,
     yield_min INTEGER DEFAULT 1,
     yield_max INTEGER DEFAULT 1,
@@ -92,4 +92,3 @@ CREATE TABLE IF NOT EXISTS bred_plants (
 module.exports = {
     db
 };
-

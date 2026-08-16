@@ -1,4 +1,4 @@
-﻿const {
+const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -120,7 +120,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ KhÃ´ng tÃ¬m tháº¥y háº¡t giá»‘ng.",
+                                    "❌ Không tìm thấy hạt giống.",
                                 ephemeral:
                                     true
                             });
@@ -141,7 +141,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ Háº¡t giá»‘ng nÃ y khÃ´ng cÃ²n trong shop.",
+                                    "❌ Hạt giống này không còn trong shop.",
                                 ephemeral:
                                     true
                             });
@@ -172,7 +172,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y.",
+                                    "❌ Không tìm thấy cây.",
                                 ephemeral:
                                     true
                             });
@@ -218,7 +218,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y.",
+                                    "❌ Không tìm thấy cây.",
                                 ephemeral:
                                     true
                             });
@@ -254,11 +254,11 @@ module.exports = (client) => {
                                         interaction.user,
 
                                     title:
-                                        "ðŸ§¬ Chá»n CÃ¢y Máº¹",
+                                        "🧬 Chọn Cây Mẹ",
 
                                     description:
-                                        `ðŸ‘¨ CÃ¢y bá»‘: ${plantEmoji(plant)} **${plantName(plant)}**\n\n` +
-                                        "ðŸŒ± BÃ¢y giá» hÃ£y chá»n cÃ¢y máº¹.",
+                                        `👨 Cây bố: ${plantEmoji(plant)} **${plantName(plant)}**\n\n` +
+                                        "🌱 Bây giờ hãy chọn cây mẹ.",
 
                                     color:
                                         COLORS.purple
@@ -291,7 +291,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ PhiÃªn lai Ä‘Ã£ háº¿t. HÃ£y báº¯t Ä‘áº§u láº¡i.",
+                                    "❌ Phiên lai đã hết. Hãy bắt đầu lại.",
                                 ephemeral:
                                     true
                             });
@@ -314,7 +314,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y.",
+                                    "❌ Không tìm thấy cây.",
                                 ephemeral:
                                     true
                             });
@@ -327,7 +327,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ CÃ¢y bá»‘ vÃ  cÃ¢y máº¹ pháº£i khÃ¡c nhau.",
+                                    "❌ Cây bố và cây mẹ phải khác nhau.",
                                 ephemeral:
                                     true
                             });
@@ -352,7 +352,7 @@ module.exports = (client) => {
 
                             return interaction.reply({
                                 content:
-                                    "âŒ Báº¡n khÃ´ng Ä‘á»§ cÃ¢y Ä‘á»ƒ lai.",
+                                    "❌ Bạn không đủ cây để lai.",
                                 ephemeral:
                                     true
                             });
@@ -378,15 +378,15 @@ module.exports = (client) => {
                                         interaction.user,
 
                                     title:
-                                        "ðŸ§¬ XÃ¡c Nháº­n Lai",
+                                        "🧬 Xác Nhận Lai",
 
                                     description:
                                         `${plantEmoji(parentA)} **${plantName(parentA)}**\n` +
-                                        "        ðŸ§¬ +\n" +
+                                        "        🧬 +\n" +
                                         `${plantEmoji(parentBPlant)} **${plantName(parentBPlant)}**\n\n` +
-                                        `> ðŸ’° Chi phÃ­: **${BREED_COST} Mora**\n` +
-                                        "> ðŸŒ± TiÃªu hao 1 cÃ¢y bá»‘ + 1 cÃ¢y máº¹.\n" +
-                                        "> âœ¨ CÃ³ cÆ¡ há»™i nháº­n Mutation.",
+                                        `> 💰 Chi phí: **${BREED_COST} Mora**\n` +
+                                        "> 🌱 Tiêu hao 1 cây bố + 1 cây mẹ.\n" +
+                                        "> ✨ Có cơ hội nhận Mutation.",
 
                                     color:
                                         COLORS.purple
@@ -460,10 +460,10 @@ module.exports = (client) => {
                                             "home_farm"
                                         )
                                         .setLabel(
-                                            "NÃ´ng tráº¡i"
+                                            "Nông trại"
                                         )
                                         .setEmoji(
-                                            "ðŸŒ±"
+                                            "🌱"
                                         )
                                         .setStyle(
                                             ButtonStyle.Success
@@ -474,10 +474,10 @@ module.exports = (client) => {
                                             "home_inventory"
                                         )
                                         .setLabel(
-                                            "TÃºi Ä‘á»“"
+                                            "Túi đồ"
                                         )
                                         .setEmoji(
-                                            "ðŸŽ’"
+                                            "🎒"
                                         )
                                         .setStyle(
                                             ButtonStyle.Secondary
@@ -488,10 +488,10 @@ module.exports = (client) => {
                                             "home"
                                         )
                                         .setLabel(
-                                            "Trang chá»§"
+                                            "Trang chủ"
                                         )
                                         .setEmoji(
-                                            "ðŸ "
+                                            "🏠"
                                         )
                                         .setStyle(
                                             ButtonStyle.Secondary
@@ -644,10 +644,10 @@ module.exports = (client) => {
                                     interaction.user,
 
                                 title:
-                                    "Gieo Háº¡t",
+                                    "Gieo Hạt",
 
                                 description:
-                                    "ðŸŒ± Chá»n giá»‘ng cÃ¢y báº¡n muá»‘n gieo."
+                                    "🌱 Chọn giống cây bạn muốn gieo."
                             })
                         ],
 
@@ -684,7 +684,7 @@ module.exports = (client) => {
                         return interaction.reply({
 
                             content:
-                                "ðŸ’§ Hiá»‡n khÃ´ng cÃ³ cÃ¢y nÃ o cáº§n tÆ°á»›i.",
+                                "💧 Hiện không có cây nào cần tưới.",
 
                             ephemeral:
                                 true
@@ -705,10 +705,10 @@ module.exports = (client) => {
                                     `water_${plot.plot_id}`
                                 )
                                 .setLabel(
-                                    `Ã” ${plot.plot_id}`
+                                    `Ô ${plot.plot_id}`
                                 )
                                 .setEmoji(
-                                    "ðŸ’§"
+                                    "💧"
                                 )
                                 .setStyle(
                                     ButtonStyle.Primary
@@ -733,10 +733,10 @@ module.exports = (client) => {
                                     interaction.user,
 
                                 title:
-                                    "TÆ°á»›i NÆ°á»›c",
+                                    "Tưới Nước",
 
                                 description:
-                                    "ðŸ’§ Chá»n Ã´ Ä‘áº¥t muá»‘n tÆ°á»›i."
+                                    "💧 Chọn ô đất muốn tưới."
                             })
                         ],
 
@@ -777,7 +777,7 @@ module.exports = (client) => {
                         return interaction.reply({
 
                             content:
-                                "ðŸŒ± ChÆ°a cÃ³ cÃ¢y nÃ o trÆ°á»Ÿng thÃ nh.",
+                                "🌱 Chưa có cây nào trưởng thành.",
 
                             ephemeral:
                                 true
@@ -798,10 +798,10 @@ module.exports = (client) => {
                                     `harvest_${plot.plot_id}`
                                 )
                                 .setLabel(
-                                    `Ã” ${plot.plot_id}`
+                                    `Ô ${plot.plot_id}`
                                 )
                                 .setEmoji(
-                                    "ðŸŒ¾"
+                                    "🌾"
                                 )
                                 .setStyle(
                                     ButtonStyle.Success
@@ -826,10 +826,10 @@ module.exports = (client) => {
                                     interaction.user,
 
                                 title:
-                                    "Thu Hoáº¡ch",
+                                    "Thu Hoạch",
 
                                 description:
-                                    "ðŸŒ¾ Chá»n cÃ¢y báº¡n muá»‘n thu hoáº¡ch."
+                                    "🌾 Chọn cây bạn muốn thu hoạch."
                             })
                         ],
 
@@ -898,7 +898,7 @@ module.exports = (client) => {
                         return interaction.reply({
 
                             content:
-                                "âŒ Báº¡n cáº§n Ã­t nháº¥t **2 giá»‘ng cÃ¢y khÃ¡c nhau** trong tÃºi Ä‘á»ƒ lai.",
+                                "❌ Bạn cần ít nhất **2 giống cây khác nhau** trong túi để lai.",
 
                             ephemeral:
                                 true
@@ -921,11 +921,11 @@ module.exports = (client) => {
                                     interaction.user,
 
                                 title:
-                                    "ðŸ§¬ Chá»n CÃ¢y Bá»‘",
+                                    "🧬 Chọn Cây Bố",
 
                                 description:
-                                    `ðŸ’° Chi phÃ­ lai: **${BREED_COST} Mora**\n\n` +
-                                    "ðŸŒ± HÃ£y chá»n cÃ¢y bá»‘ tá»« tÃºi Ä‘á»“.",
+                                    `💰 Chi phí lai: **${BREED_COST} Mora**\n\n` +
+                                    "🌱 Hãy chọn cây bố từ túi đồ.",
 
                                 color:
                                     COLORS.purple
@@ -960,7 +960,7 @@ module.exports = (client) => {
                         return interaction.reply({
 
                             content:
-                                "âŒ PhiÃªn lai Ä‘Ã£ háº¿t. HÃ£y chá»n láº¡i cÃ¢y.",
+                                "❌ Phiên lai đã hết. Hãy chọn lại cây.",
 
                             ephemeral:
                                 true
@@ -1096,7 +1096,7 @@ module.exports = (client) => {
                         await interaction.followUp({
 
                             content:
-                                "âŒ CÃ³ lá»—i xáº£y ra.",
+                                "❌ Có lỗi xảy ra.",
 
                             ephemeral:
                                 true
@@ -1107,7 +1107,7 @@ module.exports = (client) => {
                         await interaction.reply({
 
                             content:
-                                "âŒ CÃ³ lá»—i xáº£y ra.",
+                                "❌ Có lỗi xảy ra.",
 
                             ephemeral:
                                 true
@@ -1119,4 +1119,3 @@ module.exports = (client) => {
         }
     );
 };
-

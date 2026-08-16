@@ -1,4 +1,4 @@
-﻿const {
+const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -94,7 +94,7 @@ module.exports = (client) => {
                     case "ping": {
 
                         const sent = await message.reply({
-                            content: "ðŸ“ Pinging..."
+                            content: "🏓 Pinging..."
                         });
 
                         const latency =
@@ -103,7 +103,7 @@ module.exports = (client) => {
 
                         await sent.edit({
                             content:
-                                `ðŸ“ Pong! Äá»™ trá»… tin nháº¯n: ${latency}ms | API: ${Math.round(client.ws.ping)}ms`
+                                `🏓 Pong! Độ trễ tin nhắn: ${latency}ms | API: ${Math.round(client.ws.ping)}ms`
                         });
 
                         break;
@@ -146,10 +146,10 @@ module.exports = (client) => {
                                                 "home_farm"
                                             )
                                             .setLabel(
-                                                "NÃ´ng tráº¡i"
+                                                "Nông trại"
                                             )
                                             .setEmoji(
-                                                "ðŸŒ±"
+                                                "🌱"
                                             )
                                             .setStyle(
                                                 ButtonStyle.Success
@@ -160,10 +160,10 @@ module.exports = (client) => {
                                                 "home_inventory"
                                             )
                                             .setLabel(
-                                                "TÃºi Ä‘á»“"
+                                                "Túi đồ"
                                             )
                                             .setEmoji(
-                                                "ðŸŽ’"
+                                                "🎒"
                                             )
                                             .setStyle(
                                                 ButtonStyle.Secondary
@@ -174,10 +174,10 @@ module.exports = (client) => {
                                                 "home"
                                             )
                                             .setLabel(
-                                                "Trang chá»§"
+                                                "Trang chủ"
                                             )
                                             .setEmoji(
-                                                "ðŸ "
+                                                "🏠"
                                             )
                                             .setStyle(
                                                 ButtonStyle.Secondary
@@ -295,10 +295,10 @@ module.exports = (client) => {
                                             message.author,
 
                                         title:
-                                            "Gieo Háº¡t",
+                                            "Gieo Hạt",
 
                                         description:
-                                            "ðŸŒ± Chá»n giá»‘ng cÃ¢y báº¡n muá»‘n gieo."
+                                            "🌱 Chọn giống cây bạn muốn gieo."
                                     })
                                 ],
 
@@ -318,7 +318,7 @@ module.exports = (client) => {
                         if (!plant) {
 
                             await message.reply(
-                                "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y."
+                                "❌ Không tìm thấy cây."
                             );
 
                             break;
@@ -357,7 +357,7 @@ case "admin": {
 
         await message.reply({
             content:
-                "âŒ Báº¡n khÃ´ng cÃ³ quyá»n sá»­ dá»¥ng lá»‡nh Admin."
+                "❌ Bạn không có quyền sử dụng lệnh Admin."
         });
 
         break;
@@ -373,19 +373,19 @@ case "admin": {
                     message.author,
 
                 title:
-                    "âš™ï¸ Admin Panel",
+                    "⚙️ Admin Panel",
 
                 description:
                     [
-                        "ðŸ” **ADMIN MODE**",
+                        "🔐 **ADMIN MODE**",
                         "",
-                        "> `nadmin shop` â€” Ä‘á»•i shop cá»§a ngÆ°á»i dÃ¹ng",
-                        "> `nadmin mora @user 10000` â€” thÃªm Mora",
-                        "> `nadmin seed @user windwheel 10` â€” thÃªm háº¡t",
-                        "> `nadmin xp @user 100` â€” thÃªm EXP",
-                        "> `nadmin water @user 100` â€” thÃªm nÆ°á»›c",
-                        "> `nadmin resetshop @user` â€” reset shop",
-                        "> `nadmin resetuser @user` â€” reset dá»¯ liá»‡u user"
+                        "> `nadmin shop` — đổi shop của người dùng",
+                        "> `nadmin mora @user 10000` — thêm Mora",
+                        "> `nadmin seed @user windwheel 10` — thêm hạt",
+                        "> `nadmin xp @user 100` — thêm EXP",
+                        "> `nadmin water @user 100` — thêm nước",
+                        "> `nadmin resetshop @user` — reset shop",
+                        "> `nadmin resetuser @user` — reset dữ liệu user"
                     ].join("\n"),
 
                 color:
@@ -406,7 +406,7 @@ case "admin": {
                         if (!plant) {
 
                             await message.reply(
-                                "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y."
+                                "❌ Không tìm thấy cây."
                             );
 
                             break;
@@ -440,11 +440,11 @@ case "admin": {
                                         message.author,
 
                                     title:
-                                        "KhÃ´ng TÃ¬m Tháº¥y Lá»‡nh",
+                                        "Không Tìm Thấy Lệnh",
 
                                     description:
-                                        `âŒ KhÃ´ng tÃ¬m tháº¥y \`${PREFIX}${command}\`.\n\n` +
-                                        `ðŸ’¡ DÃ¹ng **\`nhelp\`**.`,
+                                        `❌ Không tìm thấy \`${PREFIX}${command}\`.\n\n` +
+                                        `💡 Dùng **\`nhelp\`**.`,
 
                                     color:
                                         COLORS.red
@@ -461,10 +461,10 @@ case "admin": {
                                                 "home_help"
                                             )
                                             .setLabel(
-                                                "HÆ°á»›ng dáº«n"
+                                                "Hướng dẫn"
                                             )
                                             .setEmoji(
-                                                "ðŸ“–"
+                                                "📖"
                                             )
                                             .setStyle(
                                                 ButtonStyle.Primary
@@ -475,10 +475,10 @@ case "admin": {
                                                 "home"
                                             )
                                             .setLabel(
-                                                "Trang chá»§"
+                                                "Trang chủ"
                                             )
                                             .setEmoji(
-                                                "ðŸ "
+                                                "🏠"
                                             )
                                             .setStyle(
                                                 ButtonStyle.Secondary
@@ -500,11 +500,10 @@ case "admin": {
                 ) {
 
                     await message.reply(
-                        "âŒ CÃ³ lá»—i xáº£y ra. HÃ£y thá»­ láº¡i."
+                        "❌ Có lỗi xảy ra. Hãy thử lại."
                     );
                 }
             }
         }
     );
 };
-

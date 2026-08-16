@@ -1,21 +1,36 @@
-﻿const fs = require("fs");
+const fs = require("fs");
 const path = require("path");
 
 // ============================================================
-// ðŸŒ± NAHIDA FARM
-// src/database/plants.js
+// 🌱 NAHIDA FARM
+// database/plants.js
+//
+// DATABASE ADAPTER
+// - Đọc dữ liệu từ data/plants.json
+// - Giữ logic database hiện tại
+// - Bổ sung API tương thích với index.js
+// - Hỗ trợ genetics / mutations
+// ============================================================
+
+
+// ============================================================
+// DATA PATH
 // ============================================================
 
 const DATA_PATH = path.join(
     __dirname,
     "..",
-    "..",
     "data",
     "plants.json"
-
 );
 
+
+// ============================================================
+// INTERNAL DATA
+// ============================================================
+
 let plants = [];
+
 
 // ============================================================
 // RARITY
@@ -29,6 +44,7 @@ const RARITY = {
     LEGENDARY: "legendary",
     MYTHIC: "mythic"
 };
+
 
 // ============================================================
 // ELEMENT
@@ -45,6 +61,7 @@ const ELEMENT = {
     CRYO: "cryo"
 };
 
+
 // ============================================================
 // REGION
 // ============================================================
@@ -59,16 +76,23 @@ const REGION = {
     NOD_KRAI: "Nod-Krai"
 };
 
+
 // ============================================================
 // MUTATIONS
+//
+// Có thể lấy mutation từ plants.json.
+//
+// Đồng thời giữ sẵn các mutation mặc định để index.js
+// không bị crash nếu plants.json chưa khai báo mutations.
 // ============================================================
 
 const DEFAULT_MUTATIONS = {
+
     golden: {
         id: "golden",
         name: "Golden",
-        viName: "HoÃ ng Kim",
-        emoji: "ðŸŒŸ",
+        viName: "Hoàng Kim",
+        emoji: "🌟",
         rarity: "legendary",
         yieldMultiplier: 2,
         sellMultiplier: 3,
@@ -78,8 +102,8 @@ const DEFAULT_MUTATIONS = {
     rainbow: {
         id: "rainbow",
         name: "Rainbow",
-        viName: "Cáº§u Vá»“ng",
-        emoji: "ðŸŒˆ",
+        viName: "Cầu Vồng",
+        emoji: "🌈",
         rarity: "mythic",
         yieldMultiplier: 3,
         sellMultiplier: 5,
@@ -89,8 +113,8 @@ const DEFAULT_MUTATIONS = {
     crystal: {
         id: "crystal",
         name: "Crystal",
-        viName: "Tinh Thá»ƒ",
-        emoji: "ðŸ’Ž",
+        viName: "Tinh Thể",
+        emoji: "💎",
         rarity: "legendary",
         yieldMultiplier: 2.5,
         sellMultiplier: 4,
@@ -100,8 +124,8 @@ const DEFAULT_MUTATIONS = {
     lunar: {
         id: "lunar",
         name: "Lunar",
-        viName: "Nguyá»‡t",
-        emoji: "ðŸŒ™",
+        viName: "Nguyệt",
+        emoji: "🌙",
         rarity: "epic",
         yieldMultiplier: 2,
         sellMultiplier: 3,
@@ -111,8 +135,8 @@ const DEFAULT_MUTATIONS = {
     divine: {
         id: "divine",
         name: "Divine",
-        viName: "Tháº§n ThÃ¡nh",
-        emoji: "âœ¨",
+        viName: "Thần Thánh",
+        emoji: "✨",
         rarity: "mythic",
         yieldMultiplier: 5,
         sellMultiplier: 10,
@@ -120,16 +144,20 @@ const DEFAULT_MUTATIONS = {
     }
 };
 
+
 // ============================================================
 // RESOURCES
+//
+// Giữ để index.js có thể gọi getResource/getAllResources.
 // ============================================================
 
 const RESOURCES = {
+
     apple: {
         id: "apple",
         name: "Apple",
-        viName: "TÃ¡o",
-        emoji: "ðŸŽ",
+        viName: "Táo",
+        emoji: "🍎",
         type: "fruit",
         rarity: "common",
         sellPrice: 12
@@ -138,8 +166,8 @@ const RESOURCES = {
     sunsettia: {
         id: "sunsettia",
         name: "Sunsettia",
-        viName: "Quáº£ Nháº­t Láº¡c",
-        emoji: "ðŸŠ",
+        viName: "Quả Nhật Lạc",
+        emoji: "🍊",
         type: "fruit",
         rarity: "common",
         sellPrice: 14
@@ -148,8 +176,8 @@ const RESOURCES = {
     berry: {
         id: "berry",
         name: "Berry",
-        viName: "Quáº£ Má»ng",
-        emoji: "ðŸ«",
+        viName: "Quả Mọng",
+        emoji: "🫐",
         type: "fruit",
         rarity: "common",
         sellPrice: 10
@@ -158,8 +186,8 @@ const RESOURCES = {
     mint: {
         id: "mint",
         name: "Mint",
-        viName: "Báº¡c HÃ ",
-        emoji: "ðŸŒ¿",
+        viName: "Bạc Hà",
+        emoji: "🌿",
         type: "herb",
         rarity: "common",
         sellPrice: 10
@@ -168,8 +196,8 @@ const RESOURCES = {
     mushroom: {
         id: "mushroom",
         name: "Mushroom",
-        viName: "Náº¥m",
-        emoji: "ðŸ„",
+        viName: "Nấm",
+        emoji: "🍄",
         type: "mushroom",
         rarity: "common",
         sellPrice: 15
@@ -178,8 +206,8 @@ const RESOURCES = {
     pinecone: {
         id: "pinecone",
         name: "Pinecone",
-        viName: "Quáº£ ThÃ´ng",
-        emoji: "ðŸŒ°",
+        viName: "Quả Thông",
+        emoji: "🌰",
         type: "fruit",
         rarity: "common",
         sellPrice: 18
@@ -189,50 +217,62 @@ const RESOURCES = {
         id: "bamboo",
         name: "Bamboo",
         viName: "Tre",
-        emoji: "ðŸŽ‹",
+        emoji: "🎋",
         type: "wood",
         rarity: "uncommon",
         sellPrice: 25
     }
 };
 
+
 // ============================================================
-// LOAD
+// LOAD DATA
 // ============================================================
 
 function loadPlants() {
+
     try {
+
         if (!fs.existsSync(DATA_PATH)) {
+
             console.error(
-                `âŒ KhÃ´ng tÃ¬m tháº¥y: ${DATA_PATH}`
+                "❌ Không tìm thấy data/plants.json"
             );
 
             plants = [];
+
             return;
         }
 
-        const raw = fs.readFileSync(
-            DATA_PATH,
-            "utf8"
-        );
+        const raw =
+            fs.readFileSync(
+                DATA_PATH,
+                "utf8"
+            );
 
-        const data = JSON.parse(raw);
+        const data =
+            JSON.parse(raw);
 
         if (!Array.isArray(data)) {
+
             throw new Error(
-                "data/plants.json pháº£i lÃ  Array."
+                "plants.json phải là Array."
             );
         }
 
         plants = data;
 
-        console.log(
-            `ðŸŒ± Loaded ${plants.length} plants.`
-        );
+        // Đồng bộ reference sau khi reload
+        module.exports.plants = plants;
+
+            console.log(
+         `🌱 Loaded ${plants.length} plants.`
+        );      
 
     } catch (error) {
+
         console.error(
-            "âŒ Plant database error:",
+            "❌ Plant database error:",
             error
         );
 
@@ -240,211 +280,314 @@ function loadPlants() {
     }
 }
 
+
+// Load database ngay khi require
 loadPlants();
+
 
 // ============================================================
 // BASIC
 // ============================================================
 
 function getAllPlants() {
+
     return plants;
 }
 
+
 function getPlant(id) {
+
     if (!id) {
         return null;
     }
 
-    const searchId = String(id)
-        .toLowerCase()
-        .trim();
+    const searchId =
+        String(id)
+            .toLowerCase()
+            .trim();
 
     return plants.find(
         plant =>
             String(plant.id || "")
-                .toLowerCase()
-                .trim() === searchId
+                .toLowerCase() === searchId
     ) || null;
 }
 
+
 function hasPlant(id) {
-    return Boolean(getPlant(id));
+
+    return Boolean(
+        getPlant(id)
+    );
 }
+
 
 // ============================================================
 // SEARCH
 // ============================================================
 
 function searchPlants(query) {
+
     if (!query) {
         return [];
     }
 
-    const text = String(query)
-        .toLowerCase()
-        .trim();
+    const text =
+        String(query)
+            .toLowerCase()
+            .trim();
 
-    return plants.filter(plant => {
-        const id = String(
-            plant.id || ""
-        ).toLowerCase();
+    return plants.filter(
+        plant => {
 
-        const name = String(
-            plant.name || ""
-        ).toLowerCase();
+            const id =
+                String(
+                    plant.id || ""
+                ).toLowerCase();
 
-        const nameVi = String(
-            plant.nameVi ||
-            plant.viName ||
-            ""
-        ).toLowerCase();
+            const name =
+                String(
+                    plant.name || ""
+                ).toLowerCase();
 
-        const region = String(
-            plant.region || ""
-        ).toLowerCase();
+            const nameVi =
+                String(
+                    plant.nameVi ||
+                    plant.viName ||
+                    ""
+                ).toLowerCase();
 
-        return (
-            id.includes(text) ||
-            name.includes(text) ||
-            nameVi.includes(text) ||
-            region.includes(text)
-        );
-    });
+            const region =
+                String(
+                    plant.region || ""
+                ).toLowerCase();
+
+            return (
+                id.includes(text) ||
+                name.includes(text) ||
+                nameVi.includes(text) ||
+                region.includes(text)
+            );
+        }
+    );
 }
 
+
 // ============================================================
-// FILTER
+// REGION
 // ============================================================
 
 function getPlantsByRegion(region) {
+
     if (!region) {
         return [];
     }
 
-    const value = String(region)
-        .toLowerCase()
-        .trim();
+    const value =
+        String(region)
+            .toLowerCase()
+            .trim();
 
     return plants.filter(
         plant =>
-            String(plant.region || "")
-                .toLowerCase()
-                .trim() === value
+            String(
+                plant.region || ""
+            )
+                .toLowerCase() === value
     );
 }
 
+
+// ============================================================
+// RARITY
+// ============================================================
+
 function getPlantsByRarity(rarity) {
+
     if (rarity === undefined || rarity === null) {
         return [];
     }
 
-    const text = String(rarity)
-        .toLowerCase()
-        .trim();
+    const text =
+        String(rarity)
+            .toLowerCase()
+            .trim();
 
     return plants.filter(
-        plant =>
-            String(plant.rarity || "")
-                .toLowerCase()
-                .trim() === text
+        plant => {
+
+            const plantRarity =
+                String(
+                    plant.rarity ?? ""
+                ).toLowerCase();
+
+            return (
+                plantRarity === text ||
+                String(plant.rarity) === text
+            );
+        }
     );
 }
+
+
+// ============================================================
+// LEVEL
+// ============================================================
 
 function getAvailablePlants(level) {
-    const currentLevel = Math.max(
-        1,
-        Number(level) || 1
+
+    const currentLevel =
+        Math.max(
+            1,
+            Number(level) || 1
+        );
+
+    return plants.filter(
+        plant => {
+
+            const unlockLevel =
+                Number(
+                    plant.unlockLevel
+                ) || 1;
+
+            return (
+                unlockLevel <=
+                currentLevel
+            );
+        }
     );
-
-    return plants.filter(plant => {
-        const unlockLevel =
-            Number(plant.unlockLevel) || 1;
-
-        return unlockLevel <= currentLevel;
-    });
 }
 
-function isPlantUnlocked(plantId, level) {
-    const plant = getPlant(plantId);
+
+function isPlantUnlocked(
+    plantId,
+    level
+) {
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return false;
     }
 
-    const currentLevel = Math.max(
-        1,
-        Number(level) || 1
-    );
+    const currentLevel =
+        Math.max(
+            1,
+            Number(level) || 1
+        );
 
     const unlockLevel =
-        Number(plant.unlockLevel) || 1;
+        Number(
+            plant.unlockLevel
+        ) || 1;
 
-    return currentLevel >= unlockLevel;
+    return (
+        currentLevel >=
+        unlockLevel
+    );
 }
 
+
 // ============================================================
-// RANDOM
+// RANDOM PLANT
 // ============================================================
 
 function randomPlant(level = 1) {
-    const available =
-        getAvailablePlants(level);
 
-    if (!available.length) {
+    const available =
+        getAvailablePlants(
+            level
+        );
+
+    if (
+        available.length === 0
+    ) {
         return null;
     }
 
     return available[
         Math.floor(
-            Math.random() * available.length
+            Math.random() *
+            available.length
         )
     ];
 }
 
-function randomCommonPlant() {
-    const common = plants.filter(plant => {
-        const rarity =
-            String(
-                plant.rarity || ""
-            ).toLowerCase();
 
-        return (
-            rarity === "common" ||
-            rarity === "1"
+// ============================================================
+// RANDOM COMMON PLANT
+// ============================================================
+
+function randomCommonPlant() {
+
+    const common =
+        plants.filter(
+            plant => {
+
+                const rarity =
+                    String(
+                        plant.rarity || ""
+                    ).toLowerCase();
+
+                return (
+                    rarity === "common" ||
+                    rarity === "1"
+                );
+            }
         );
-    });
 
     if (!common.length) {
-        return plants[0] || null;
+
+        return (
+            plants[0] ||
+            null
+        );
     }
 
     return common[
         Math.floor(
-            Math.random() * common.length
+            Math.random() *
+            common.length
         )
     ];
 }
 
+
 // ============================================================
-// FARM
+// YIELD
 // ============================================================
 
 function getYield(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 0;
     }
 
+    // Trường hợp yield là object:
+    //
+    // yield: {
+    //     min: 2,
+    //     max: 5
+    // }
+
     if (
         plant.yield &&
         typeof plant.yield === "object"
     ) {
+
         const min =
-            Number(plant.yield.min) || 1;
+            Number(
+                plant.yield.min
+            ) || 1;
 
         const max =
-            Number(plant.yield.max) || min;
+            Number(
+                plant.yield.max
+            ) || min;
 
         return Math.floor(
             Math.random() *
@@ -452,14 +595,32 @@ function getYield(plantId) {
         ) + min;
     }
 
-    return Math.max(
-        1,
-        Number(plant.yield) || 1
-    );
+    // Trường hợp yield là number
+    if (
+        typeof plant.yield === "number"
+    ) {
+
+        return Math.max(
+            1,
+            Math.floor(
+                plant.yield
+            )
+        );
+    }
+
+    return 1;
 }
 
+
+// ============================================================
+// COMPATIBILITY
+// getPlantYield()
+// ============================================================
+
 function getPlantYield(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 1;
@@ -469,20 +630,32 @@ function getPlantYield(plantId) {
         plant.yield &&
         typeof plant.yield === "object"
     ) {
-        return Math.max(
-            1,
-            Number(plant.yield.min) || 1
-        );
+
+        const min =
+            Number(
+                plant.yield.min
+            ) || 1;
+
+        return min;
     }
 
     return Math.max(
         1,
-        Number(plant.yield) || 1
+        Number(
+            plant.yield
+        ) || 1
     );
 }
 
+
+// ============================================================
+// GROWTH
+// ============================================================
+
 function getGrowthTime(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 300;
@@ -490,16 +663,30 @@ function getGrowthTime(plantId) {
 
     return Math.max(
         1,
-        Number(plant.growthTime) || 300
+        Number(
+            plant.growthTime
+        ) || 300
     );
 }
 
+
+// Compatibility
 function getPlantGrowthTime(plantId) {
-    return getGrowthTime(plantId);
+
+    return getGrowthTime(
+        plantId
+    );
 }
 
+
+// ============================================================
+// WATER
+// ============================================================
+
 function getWaterCost(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 10;
@@ -507,12 +694,21 @@ function getWaterCost(plantId) {
 
     return Math.max(
         1,
-        Number(plant.waterCost) || 10
+        Number(
+            plant.waterCost
+        ) || 10
     );
 }
+
+
+// ============================================================
+// SEED PRICE
+// ============================================================
 
 function getPlantSeedPrice(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 0;
@@ -520,12 +716,21 @@ function getPlantSeedPrice(plantId) {
 
     return Math.max(
         0,
-        Number(plant.seedPrice) || 0
+        Number(
+            plant.seedPrice
+        ) || 0
     );
 }
+
+
+// ============================================================
+// SELL PRICE
+// ============================================================
 
 function getSellPrice(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 0;
@@ -533,20 +738,30 @@ function getSellPrice(plantId) {
 
     return Math.max(
         0,
-        Number(plant.sellPrice) || 0
+        Number(
+            plant.sellPrice
+        ) || 0
     );
 }
 
+
+// Compatibility
 function getPlantSellPrice(plantId) {
-    return getSellPrice(plantId);
+
+    return getSellPrice(
+        plantId
+    );
 }
+
 
 // ============================================================
 // XP
 // ============================================================
 
 function getFarmXP(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 0;
@@ -554,12 +769,17 @@ function getFarmXP(plantId) {
 
     return Math.max(
         0,
-        Number(plant.farmXP) || 0
+        Number(
+            plant.farmXP
+        ) || 0
     );
 }
+
 
 function getProfileXP(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return 0;
@@ -567,85 +787,151 @@ function getProfileXP(plantId) {
 
     return Math.max(
         0,
-        Number(plant.profileXP) || 0
+        Number(
+            plant.profileXP
+        ) || 0
     );
 }
+
 
 // ============================================================
 // GENETICS
 // ============================================================
 
 function getGenes(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return null;
     }
 
-    const genes = plant.genes || {};
-
     return {
+
         growth:
-            Number(genes.growth) || 0,
+            Number(
+                plant.genes?.growth
+            ) || 0,
 
         yield:
-            Number(genes.yield) || 0,
+            Number(
+                plant.genes?.yield
+            ) || 0,
 
         water:
-            Number(genes.water) || 0,
+            Number(
+                plant.genes?.water
+            ) || 0,
 
         rarity:
-            Number(genes.rarity) || 0,
+            Number(
+                plant.genes?.rarity
+            ) || 0,
 
         beauty:
-            Number(genes.beauty) || 0,
+            Number(
+                plant.genes?.beauty
+            ) || 0,
 
         mutation:
-            Number(genes.mutation) || 0
+            Number(
+                plant.genes?.mutation
+            ) || 0
     };
 }
 
+
 // ============================================================
-// MUTATIONS
+// MUTATIONS PER PLANT
 // ============================================================
 
 function getMutations(plantId) {
-    const plant = getPlant(plantId);
+
+    const plant =
+        getPlant(plantId);
+
+    if (!plant) {
+        return [];
+    }
 
     if (
-        !plant ||
-        !Array.isArray(plant.mutations)
+        !Array.isArray(
+            plant.mutations
+        )
     ) {
         return [];
     }
 
-    return [...plant.mutations];
+    return [
+        ...plant.mutations
+    ];
 }
 
+
+// ============================================================
+// GET ALL MUTATIONS
+//
+// Đây là phần sửa lỗi:
+// plantDatabase.getAllMutations is not a function
+// ============================================================
+
 function getAllMutations() {
+
     const mutations = {};
 
-    for (const plant of plants) {
-        if (!Array.isArray(plant.mutations)) {
+    // Lấy mutation từ plants.json
+    for (
+        const plant of plants
+    ) {
+
+        if (
+            !Array.isArray(
+                plant.mutations
+            )
+        ) {
             continue;
         }
 
-        for (const mutation of plant.mutations) {
-            if (typeof mutation === "string") {
-                const id = mutation
-                    .toLowerCase()
-                    .trim();
+        for (
+            const mutation of plant.mutations
+        ) {
+
+            if (
+                typeof mutation === "string"
+            ) {
+
+                const id =
+                    mutation
+                        .toLowerCase()
+                        .trim();
 
                 if (!mutations[id]) {
+
                     mutations[id] = {
+
                         id,
-                        name: mutation,
-                        viName: mutation,
-                        emoji: "âœ¨",
-                        rarity: "rare",
-                        yieldMultiplier: 1,
-                        sellMultiplier: 1,
-                        chance: 0
+
+                        name:
+                            mutation,
+
+                        viName:
+                            mutation,
+
+                        emoji:
+                            "✨",
+
+                        rarity:
+                            "rare",
+
+                        yieldMultiplier:
+                            1,
+
+                        sellMultiplier:
+                            1,
+
+                        chance:
+                            0
                     };
                 }
 
@@ -656,15 +942,18 @@ function getAllMutations() {
                 mutation &&
                 typeof mutation === "object"
             ) {
-                const id = String(
-                    mutation.id ||
-                    mutation.name ||
-                    ""
-                )
-                    .toLowerCase()
-                    .trim();
+
+                const id =
+                    String(
+                        mutation.id ||
+                        mutation.name ||
+                        ""
+                    )
+                        .toLowerCase()
+                        .trim();
 
                 if (id) {
+
                     mutations[id] = {
                         ...mutation,
                         id
@@ -674,53 +963,90 @@ function getAllMutations() {
         }
     }
 
+    // Bổ sung mutation mặc định
+    // nếu plants.json chưa có
     for (
         const [id, mutation]
-        of Object.entries(DEFAULT_MUTATIONS)
+        of Object.entries(
+            DEFAULT_MUTATIONS
+        )
     ) {
-        if (!mutations[id]) {
+
+        if (
+            !mutations[id]
+        ) {
+
             mutations[id] = {
                 ...mutation
             };
         }
     }
 
-    return Object.values(mutations);
+    return Object.values(
+        mutations
+    );
 }
 
+
+// ============================================================
+// GET MUTATION
+// ============================================================
+
 function getMutation(id) {
+
     if (!id) {
         return null;
     }
 
-    const value = String(id)
-        .toLowerCase()
-        .trim();
+    const value =
+        String(id)
+            .toLowerCase()
+            .trim();
 
-    return getAllMutations().find(
+    const mutations =
+        getAllMutations();
+
+    return mutations.find(
         mutation =>
-            String(mutation.id)
-                .toLowerCase() === value
+            String(
+                mutation.id
+            ).toLowerCase() === value
     ) || null;
 }
 
+
+// ============================================================
+// MUTATION ROLL
+// ============================================================
+
 function rollMutation() {
-    const mutations = getAllMutations();
 
-    const sorted = [...mutations].sort(
-        (a, b) =>
-            Number(b.chance || 0) -
-            Number(a.chance || 0)
-    );
+    const mutations =
+        getAllMutations();
 
-    for (const mutation of sorted) {
+    // Sắp xếp mutation hiếm trước
+    const sorted =
+        [...mutations]
+            .sort(
+                (a, b) =>
+                    Number(a.chance || 0) -
+                    Number(b.chance || 0)
+            );
+
+    for (
+        const mutation of sorted
+    ) {
+
         const chance =
-            Number(mutation.chance) || 0;
+            Number(
+                mutation.chance
+            ) || 0;
 
         if (
             chance > 0 &&
             Math.random() < chance
         ) {
+
             return mutation;
         }
     }
@@ -728,32 +1054,49 @@ function rollMutation() {
     return null;
 }
 
+
 // ============================================================
 // RESOURCES
 // ============================================================
 
 function getResource(id) {
+
     if (!id) {
         return null;
     }
 
-    const value = String(id)
-        .toLowerCase()
-        .trim();
+    const value =
+        String(id)
+            .toLowerCase()
+            .trim();
 
-    return RESOURCES[value] || null;
+    return (
+        RESOURCES[value] ||
+        null
+    );
 }
+
 
 function getAllResources() {
-    return Object.values(RESOURCES);
+
+    return Object.values(
+        RESOURCES
+    );
 }
+
 
 // ============================================================
 // DISPLAY
 // ============================================================
 
 function getRarityStars(rarity) {
-    const map = {
+
+    let value =
+        Number(rarity);
+
+    // Nếu rarity là string
+    const rarityMap = {
+
         common: 1,
         uncommon: 2,
         rare: 3,
@@ -762,37 +1105,52 @@ function getRarityStars(rarity) {
         mythic: 5
     };
 
-    let value;
+    if (
+        typeof rarity === "string" &&
+        rarityMap[
+            rarity.toLowerCase()
+        ]
+    ) {
 
-    if (typeof rarity === "string") {
         value =
-            map[rarity.toLowerCase()];
-    } else {
-        value = Number(rarity);
+            rarityMap[
+                rarity.toLowerCase()
+            ];
     }
 
-    value = Math.max(
-        1,
-        Math.min(
-            5,
-            value || 1
-        )
-    );
+    value =
+        Math.max(
+            1,
+            Math.min(
+                5,
+                value || 1
+            )
+        );
 
-    return "â­".repeat(value);
+    return (
+        "⭐".repeat(value)
+    );
 }
 
-function getPlantDisplay(plantId) {
-    const plant = getPlant(plantId);
+
+function getPlantDisplay(
+    plantId
+) {
+
+    const plant =
+        getPlant(plantId);
 
     if (!plant) {
         return null;
     }
 
     return {
-        id: plant.id,
 
-        name: plant.name,
+        id:
+            plant.id,
+
+        name:
+            plant.name,
 
         nameVi:
             plant.nameVi ||
@@ -800,11 +1158,13 @@ function getPlantDisplay(plantId) {
 
         emoji:
             plant.emoji ||
-            "ðŸŒ±",
+            "🌱",
 
-        region: plant.region,
+        region:
+            plant.region,
 
-        rarity: plant.rarity,
+        rarity:
+            plant.rarity,
 
         rarityText:
             getRarityStars(
@@ -836,10 +1196,14 @@ function getPlantDisplay(plantId) {
             plant.color,
 
         genes:
-            getGenes(plant.id),
+            getGenes(
+                plant.id
+            ),
 
         mutations:
-            getMutations(plant.id),
+            getMutations(
+                plant.id
+            ),
 
         unlockLevel:
             plant.unlockLevel,
@@ -849,15 +1213,26 @@ function getPlantDisplay(plantId) {
     };
 }
 
+
+// ============================================================
+// FORMAT PLANT
+// ============================================================
+
 function formatPlant(id) {
-    const plant = getPlant(id);
+
+    const plant =
+        getPlant(id);
 
     if (!plant) {
-        return "ðŸŒ± CÃ¢y khÃ´ng xÃ¡c Ä‘á»‹nh";
+
+        return (
+            "🌱 Cây không xác định"
+        );
     }
 
     const emoji =
-        plant.emoji || "ðŸŒ±";
+        plant.emoji ||
+        "🌱";
 
     const name =
         plant.nameVi ||
@@ -868,22 +1243,32 @@ function formatPlant(id) {
     return `${emoji} ${name}`;
 }
 
+
 // ============================================================
 // VALIDATE
 // ============================================================
 
 function validatePlants() {
+
     const errors = [];
 
-    for (const plant of plants) {
+    for (
+        const plant of plants
+    ) {
+
         if (!plant.id) {
-            errors.push("Plant thiáº¿u id.");
+
+            errors.push(
+                "Plant thiếu id."
+            );
+
             continue;
         }
 
         if (!plant.name) {
+
             errors.push(
-                `${plant.id}: thiáº¿u name`
+                `${plant.id}: thiếu name`
             );
         }
 
@@ -891,36 +1276,41 @@ function validatePlants() {
             !plant.nameVi &&
             !plant.viName
         ) {
+
             errors.push(
-                `${plant.id}: thiáº¿u nameVi`
+                `${plant.id}: thiếu nameVi`
             );
         }
 
         if (!plant.emoji) {
+
             errors.push(
-                `${plant.id}: thiáº¿u emoji`
+                `${plant.id}: thiếu emoji`
             );
         }
 
         if (
             plant.growthTime === undefined
         ) {
+
             errors.push(
-                `${plant.id}: thiáº¿u growthTime`
+                `${plant.id}: thiếu growthTime`
             );
         }
 
         if (
             plant.yield === undefined
         ) {
+
             errors.push(
-                `${plant.id}: thiáº¿u yield`
+                `${plant.id}: thiếu yield`
             );
         }
 
         if (!plant.genes) {
+
             errors.push(
-                `${plant.id}: thiáº¿u genes`
+                `${plant.id}: thiếu genes`
             );
         }
     }
@@ -928,23 +1318,30 @@ function validatePlants() {
     return errors;
 }
 
+
 // ============================================================
 // RELOAD
 // ============================================================
 
 function reloadPlants() {
+
     loadPlants();
+
+    // Cập nhật reference cho module.exports
+    module.exports.plants = plants;
+
     return plants;
 }
+
 
 // ============================================================
 // EXPORT
 // ============================================================
 
 module.exports = {
-    get plants() {
-        return plants;
-    },
+
+    // Data
+    plants,
 
     RARITY,
     ELEMENT,
@@ -953,22 +1350,27 @@ module.exports = {
     RESOURCES,
     DEFAULT_MUTATIONS,
 
+    // Loading
     loadPlants,
     reloadPlants,
 
+    // Plants
     getAllPlants,
     getPlant,
     hasPlant,
     searchPlants,
 
+    // Filter
     getPlantsByRegion,
     getPlantsByRarity,
     getAvailablePlants,
     isPlantUnlocked,
 
+    // Random
     randomPlant,
     randomCommonPlant,
 
+    // Farm
     getYield,
     getPlantYield,
 
@@ -982,22 +1384,28 @@ module.exports = {
     getSellPrice,
     getPlantSellPrice,
 
+    // XP
     getFarmXP,
     getProfileXP,
 
+    // Genetics
     getGenes,
 
+    // Mutation
     getMutations,
     getAllMutations,
     getMutation,
     rollMutation,
 
+    // Resources
     getResource,
     getAllResources,
 
+    // Display
     getRarityStars,
     getPlantDisplay,
     formatPlant,
 
+    // Validate
     validatePlants
 };

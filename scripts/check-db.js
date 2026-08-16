@@ -1,4 +1,4 @@
-const db = require("../src/database/database");
+const db = require("./src/database/database");
 
 console.log("\n=== plant_genes ===");
 

@@ -1,4 +1,4 @@
-﻿const {
+const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
@@ -8,7 +8,7 @@
 const { db } = require("../db");
 
 const plantDatabase =
-    require("../database/plants");
+    require("../../database/plants");
 
 const {
     SHOP_SIZE,
@@ -400,27 +400,27 @@ function shopEmbed(
     const lines = [];
 
     lines.push(
-        `\`${user.username}\` â€” **Lv.${data.level}**`
+        `\`${user.username}\` — **Lv.${data.level}**`
     );
 
     lines.push("");
 
     lines.push(
-        `ðŸ’° **Mora:** ${data.mora.toLocaleString()}`
+        `💰 **Mora:** ${data.mora.toLocaleString()}`
     );
 
     lines.push(
-        `ðŸ”„ **Äá»•i miá»…n phÃ­ hÃ´m nay:** ${state.free_refreshes}/${FREE_SHOP_REFRESHES}`
+        `🔄 **Đổi miễn phí hôm nay:** ${state.free_refreshes}/${FREE_SHOP_REFRESHES}`
     );
 
     lines.push("");
 
     lines.push(
-        "ðŸ›’ **Háº T GIá»NG HÃ”M NAY**"
+        "🛒 **HẠT GIỐNG HÔM NAY**"
     );
 
     lines.push(
-        `> Shop cÃ¡ nhÃ¢n â€¢ **${plants.length}/${SHOP_SIZE}** loáº¡i`
+        `> Shop cá nhân • **${plants.length}/${SHOP_SIZE}** loại`
     );
 
     if (
@@ -434,7 +434,7 @@ function shopEmbed(
             );
 
         lines.push(
-            `> â±ï¸ Shop tá»± Ä‘á»•i <t:${refreshAt}:R>`
+            `> ⏱️ Shop tự đổi <t:${refreshAt}:R>`
         );
     }
 
@@ -443,7 +443,7 @@ function shopEmbed(
     if (!plants.length) {
 
         lines.push(
-            "> ðŸŒ± Hiá»‡n chÆ°a cÃ³ háº¡t giá»‘ng nÃ o Ä‘Æ°á»£c má»Ÿ khÃ³a."
+            "> 🌱 Hiện chưa có hạt giống nào được mở khóa."
         );
 
     } else {
@@ -478,11 +478,11 @@ function shopEmbed(
             );
 
             lines.push(
-                `> ðŸ’° **${price.toLocaleString()} Mora** â€¢ â±ï¸ ${formatTime(growth)}`
+                `> 💰 **${price.toLocaleString()} Mora** • ⏱️ ${formatTime(growth)}`
             );
 
             lines.push(
-                `> ðŸŽ’ Äang cÃ³: **${owned}**`
+                `> 🎒 Đang có: **${owned}**`
             );
 
             lines.push("");
@@ -490,12 +490,12 @@ function shopEmbed(
     }
 
     lines.push(
-        `ðŸ’¡ Äá»•i shop: **3 láº§n miá»…n phÃ­/ngÃ y**, sau Ä‘Ã³ **${SHOP_REFRESH_COST} Mora/láº§n**.`
+        `💡 Đổi shop: **3 lần miễn phí/ngày**, sau đó **${SHOP_REFRESH_COST} Mora/lần**.`
     );
 
     return farmEmbed({
         user,
-        title: "Cá»­a HÃ ng",
+        title: "Cửa Hàng",
         description:
             lines.join("\n"),
         color:
@@ -527,10 +527,10 @@ function shopSelectMenu(
                             "home"
                         )
                         .setLabel(
-                            "Trang chá»§"
+                            "Trang chủ"
                         )
                         .setEmoji(
-                            "ðŸ "
+                            "🏠"
                         )
                         .setStyle(
                             ButtonStyle.Secondary
@@ -563,7 +563,7 @@ function shopSelectMenu(
                             ),
 
                     description:
-                        `${price.toLocaleString()} Mora â€¢ Äang cÃ³: ${owned}`
+                        `${price.toLocaleString()} Mora • Đang có: ${owned}`
                             .slice(
                                 0,
                                 100
@@ -581,7 +581,7 @@ function shopSelectMenu(
                 "shop_buy"
             )
             .setPlaceholder(
-                "ðŸ›’ Chá»n háº¡t giá»‘ng muá»‘n mua..."
+                "🛒 Chọn hạt giống muốn mua..."
             )
             .addOptions(
                 options
@@ -604,10 +604,10 @@ function shopSelectMenu(
                         "home_farm"
                     )
                     .setLabel(
-                        "NÃ´ng tráº¡i"
+                        "Nông trại"
                     )
                     .setEmoji(
-                        "ðŸŒ±"
+                        "🌱"
                     )
                     .setStyle(
                         ButtonStyle.Success
@@ -618,10 +618,10 @@ function shopSelectMenu(
                         "home_inventory"
                     )
                     .setLabel(
-                        "TÃºi Ä‘á»“"
+                        "Túi đồ"
                     )
                     .setEmoji(
-                        "ðŸŽ’"
+                        "🎒"
                     )
                     .setStyle(
                         ButtonStyle.Secondary
@@ -632,10 +632,10 @@ function shopSelectMenu(
                         "home"
                     )
                     .setLabel(
-                        "Trang chá»§"
+                        "Trang chủ"
                     )
                     .setEmoji(
-                        "ðŸ "
+                        "🏠"
                     )
                     .setStyle(
                         ButtonStyle.Secondary
@@ -700,7 +700,7 @@ async function forceRefreshShop(
 
             return interaction.reply({
                 content:
-                    `âŒ Báº¡n cáº§n **${cost.toLocaleString()} Mora** Ä‘á»ƒ Ä‘á»•i shop.`,
+                    `❌ Bạn cần **${cost.toLocaleString()} Mora** để đổi shop.`,
                 ephemeral: true
             });
         }
@@ -790,7 +790,7 @@ async function forceRefreshShop(
 
             return interaction.reply({
                 content:
-                    "âŒ Báº¡n khÃ´ng Ä‘á»§ Mora.",
+                    "❌ Bạn không đủ Mora.",
                 ephemeral: true
             });
         }
@@ -810,8 +810,8 @@ async function forceRefreshShop(
 
     const message =
         cost === 0
-            ? `ðŸŽ **Äá»•i shop miá»…n phÃ­ thÃ nh cÃ´ng!**\n\n> ðŸ”„ CÃ²n **${newState.free_refreshes}/${FREE_SHOP_REFRESHES}** lÆ°á»£t miá»…n phÃ­ hÃ´m nay.`
-            : `ðŸ”„ **Äá»•i shop thÃ nh cÃ´ng!**\n\n> ðŸ’° ÄÃ£ tráº£: **${cost.toLocaleString()} Mora**\n> ðŸ’° CÃ²n láº¡i: **${newUser.mora.toLocaleString()} Mora**`;
+            ? `🎁 **Đổi shop miễn phí thành công!**\n\n> 🔄 Còn **${newState.free_refreshes}/${FREE_SHOP_REFRESHES}** lượt miễn phí hôm nay.`
+            : `🔄 **Đổi shop thành công!**\n\n> 💰 Đã trả: **${cost.toLocaleString()} Mora**\n> 💰 Còn lại: **${newUser.mora.toLocaleString()} Mora**`;
 
     return interaction.update({
 
@@ -852,7 +852,7 @@ async function buySeeds(
 
         return interaction.reply({
             content:
-                "âŒ KhÃ´ng tÃ¬m tháº¥y háº¡t giá»‘ng.",
+                "❌ Không tìm thấy hạt giống.",
             ephemeral: true
         });
     }
@@ -873,7 +873,7 @@ async function buySeeds(
 
         return interaction.reply({
             content:
-                "âŒ Háº¡t giá»‘ng nÃ y khÃ´ng cÃ²n náº±m trong shop hiá»‡n táº¡i.",
+                "❌ Hạt giống này không còn nằm trong shop hiện tại.",
             ephemeral: true
         });
     }
@@ -892,7 +892,7 @@ async function buySeeds(
 
         return interaction.reply({
             content:
-                `ðŸ”’ Báº¡n cáº§n **Lv.${plant.unlockLevel}** Ä‘á»ƒ mua háº¡t giá»‘ng nÃ y.`,
+                `🔒 Bạn cần **Lv.${plant.unlockLevel}** để mua hạt giống này.`,
             ephemeral: true
         });
     }
@@ -911,7 +911,7 @@ async function buySeeds(
 
         return interaction.reply({
             content:
-                "âŒ Sá»‘ lÆ°á»£ng khÃ´ng há»£p lá»‡.",
+                "❌ Số lượng không hợp lệ.",
             ephemeral: true
         });
     }
@@ -923,7 +923,7 @@ async function buySeeds(
 
         return interaction.reply({
             content:
-                `âŒ Tá»‘i Ä‘a **${MAX_BUY_QUANTITY} háº¡t/láº§n**.`,
+                `❌ Tối đa **${MAX_BUY_QUANTITY} hạt/lần**.`,
             ephemeral: true
         });
     }
@@ -944,12 +944,12 @@ async function buySeeds(
 
         return interaction.reply({
             content:
-                `âŒ KhÃ´ng Ä‘á»§ Mora.\n\n` +
-                `ðŸŒ± ${plantName(plant)}\n` +
-                `ðŸ”¢ Ã—${quantity}\n` +
-                `ðŸ’° ÄÆ¡n giÃ¡: ${price.toLocaleString()} Mora\n` +
-                `ðŸ’° Tá»•ng: ${total.toLocaleString()} Mora\n` +
-                `ðŸ’° Báº¡n cÃ³: ${user.mora.toLocaleString()} Mora`,
+                `❌ Không đủ Mora.\n\n` +
+                `🌱 ${plantName(plant)}\n` +
+                `🔢 ×${quantity}\n` +
+                `💰 Đơn giá: ${price.toLocaleString()} Mora\n` +
+                `💰 Tổng: ${total.toLocaleString()} Mora\n` +
+                `💰 Bạn có: ${user.mora.toLocaleString()} Mora`,
             ephemeral: true
         });
     }
@@ -1001,7 +1001,7 @@ async function buySeeds(
 
             return interaction.reply({
                 content:
-                    "âŒ Báº¡n khÃ´ng Ä‘á»§ Mora.",
+                    "❌ Bạn không đủ Mora.",
                 ephemeral: true
             });
         }
@@ -1030,15 +1030,15 @@ async function buySeeds(
                     interaction.user,
 
                 title:
-                    "Mua Háº¡t Giá»‘ng",
+                    "Mua Hạt Giống",
 
                 description:
                     `${plantEmoji(plant)} **${plantName(plant)}**\n\n` +
-                    `> ðŸŒ± ÄÃ£ mua: **Ã—${quantity}**\n` +
-                    `> ðŸ’° ÄÆ¡n giÃ¡: **${price.toLocaleString()} Mora**\n` +
-                    `> ðŸ’° Tá»•ng: **-${total.toLocaleString()} Mora**\n` +
-                    `> ðŸŽ’ Trong tÃºi: **Ã—${owned}**\n` +
-                    `> ðŸ’° CÃ²n láº¡i: **${newUser.mora.toLocaleString()} Mora**`,
+                    `> 🌱 Đã mua: **×${quantity}**\n` +
+                    `> 💰 Đơn giá: **${price.toLocaleString()} Mora**\n` +
+                    `> 💰 Tổng: **-${total.toLocaleString()} Mora**\n` +
+                    `> 🎒 Trong túi: **×${owned}**\n` +
+                    `> 💰 Còn lại: **${newUser.mora.toLocaleString()} Mora**`,
 
                 color:
                     COLORS.gold
@@ -1064,4 +1064,3 @@ module.exports = {
     forceRefreshShop,
     buySeeds
 };
-
