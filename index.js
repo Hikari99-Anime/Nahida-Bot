@@ -4889,6 +4889,24 @@ client.on(
                 command
             ) {
 
+                case "ping": {
+
+                    const sent = await message.reply({
+                        content: "🏓 Pinging..."
+                    });
+
+                    const latency =
+                        sent.createdTimestamp -
+                        message.createdTimestamp;
+
+                    await sent.edit({
+                        content:
+                            `🏓 Pong! Độ trễ tin nhắn: ${latency}ms | API: ${Math.round(client.ws.ping)}ms`
+                    });
+
+                    break;
+                }
+
                 case "start":
                 case "home":
 
