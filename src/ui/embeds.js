@@ -1,7 +1,7 @@
-const { EmbedBuilder } = require("discord.js");
+﻿const { EmbedBuilder } = require("discord.js");
 
 const plantDatabase =
-    require("../../database/plants");
+    require("../database/plants");
 
 const { COLORS, SHOP_REFRESH_COST, BREED_COST } = require("../config");
 const { unixSeconds, formatTime } = require("../utils/time");
@@ -39,14 +39,14 @@ function farmEmbed({
             COLORS.green
         )
         .setTitle(
-            `🌱 ${title}`
+            `ðŸŒ± ${title}`
         )
         .setDescription(
             description
         )
         .setFooter({
             text:
-                `${user.username} • Lv.${data.level} • 💰 ${data.mora.toLocaleString()} Mora`
+                `${user.username} â€¢ Lv.${data.level} â€¢ ðŸ’° ${data.mora.toLocaleString()} Mora`
         })
         .setTimestamp();
 }
@@ -63,23 +63,23 @@ function homeEmbed(
         getUser(user);
 
     const text = [
-        `\`${user.username}\` — **Lv.${data.level}**`,
+        `\`${user.username}\` â€” **Lv.${data.level}**`,
         "",
-        "> “Mỗi hạt giống đều mang trong mình",
-        "> một giấc mơ nhỏ.”",
-        "> — Nahida",
+        "> â€œMá»—i háº¡t giá»‘ng Ä‘á»u mang trong mÃ¬nh",
+        "> má»™t giáº¥c mÆ¡ nhá».â€",
+        "> â€” Nahida",
         "",
-        `💰 ${data.mora.toLocaleString()} Mora`,
-        `💧 ${data.water}/100 Nước`,
+        `ðŸ’° ${data.mora.toLocaleString()} Mora`,
+        `ðŸ’§ ${data.water}/100 NÆ°á»›c`,
         "",
-        "🌱 Chăm sóc khu vườn của bạn,",
-        "lai tạo giống cây mới và khám phá",
-        "những đột biến hiếm."
+        "ðŸŒ± ChÄƒm sÃ³c khu vÆ°á»n cá»§a báº¡n,",
+        "lai táº¡o giá»‘ng cÃ¢y má»›i vÃ  khÃ¡m phÃ¡",
+        "nhá»¯ng Ä‘á»™t biáº¿n hiáº¿m."
     ].join("\n");
 
     return farmEmbed({
         user,
-        title: "Khu Vườn",
+        title: "Khu VÆ°á»n",
         description: text,
         color: COLORS.green
     });
@@ -99,21 +99,21 @@ function profileEmbed(
     const text = [
         `\`${user.username}\``,
         "",
-        `⭐ Level: **${data.level}**`,
-        `✨ EXP: **${data.xp}/${xpRequired(data.level)}**`,
-        `🌱 Farm Level: **${data.farm_level}**`,
-        `🌾 Farm EXP: **${data.farm_xp}/${data.farm_level * 100}**`,
+        `â­ Level: **${data.level}**`,
+        `âœ¨ EXP: **${data.xp}/${xpRequired(data.level)}**`,
+        `ðŸŒ± Farm Level: **${data.farm_level}**`,
+        `ðŸŒ¾ Farm EXP: **${data.farm_xp}/${data.farm_level * 100}**`,
         "",
-        `💰 Mora: **${data.mora.toLocaleString()}**`,
-        `💧 Nước: **${data.water}/100**`,
+        `ðŸ’° Mora: **${data.mora.toLocaleString()}**`,
+        `ðŸ’§ NÆ°á»›c: **${data.water}/100**`,
         "",
-        `🌾 Đã thu hoạch: **${data.harvest_count}**`,
-        `🐛 Đã bắt sâu: **${data.bug_count}**`
+        `ðŸŒ¾ ÄÃ£ thu hoáº¡ch: **${data.harvest_count}**`,
+        `ðŸ› ÄÃ£ báº¯t sÃ¢u: **${data.bug_count}**`
     ].join("\n");
 
     return farmEmbed({
         user,
-        title: "Hồ Sơ",
+        title: "Há»“ SÆ¡",
         description: text,
         color: COLORS.purple
     });
@@ -133,16 +133,16 @@ function inventoryEmbed(
         );
 
     const lines = [
-        `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+        `\`${user.username}\` â€” **Lv.${getUser(user).level}**`,
         "",
-        "🎒 **TÚI ĐỒ**",
+        "ðŸŽ’ **TÃšI Äá»’**",
         ""
     ];
 
     if (!items.length) {
 
         lines.push(
-            "> 🎒 Túi đồ đang trống."
+            "> ðŸŽ’ TÃºi Ä‘á»“ Ä‘ang trá»‘ng."
         );
 
     } else {
@@ -161,14 +161,14 @@ function inventoryEmbed(
             }
 
             lines.push(
-                `${plantEmoji(plant)} **${plantName(plant)}** ×${item.quantity}`
+                `${plantEmoji(plant)} **${plantName(plant)}** Ã—${item.quantity}`
             );
         }
     }
 
     return farmEmbed({
         user,
-        title: "Túi Đồ",
+        title: "TÃºi Äá»“",
         description:
             lines.join("\n"),
         color:
@@ -231,33 +231,33 @@ function plantDetailEmbed(
     );
 
     lines.push(
-        `⭐ Rarity: **${plant.rarity ?? plant.rarity_gene ?? "?"}**`
+        `â­ Rarity: **${plant.rarity ?? plant.rarity_gene ?? "?"}**`
     );
 
     lines.push("");
 
     lines.push(
-        "🌱 **CANH TÁC**"
+        "ðŸŒ± **CANH TÃC**"
     );
 
     lines.push(
-        `> ⏱️ Sinh trưởng: ${formatTime(plantGrowth(plant))}`
+        `> â±ï¸ Sinh trÆ°á»Ÿng: ${formatTime(plantGrowth(plant))}`
     );
 
     lines.push(
-        `> 🌾 Sản lượng: ${plant.yield_min ?? plant.yield?.min ?? plant.yield ?? 1}–${plant.yield_max ?? plant.yield?.max ?? plant.yield ?? 1}`
+        `> ðŸŒ¾ Sáº£n lÆ°á»£ng: ${plant.yield_min ?? plant.yield?.min ?? plant.yield ?? 1}â€“${plant.yield_max ?? plant.yield?.max ?? plant.yield ?? 1}`
     );
 
     lines.push(
-        `> 💧 Nước: ${plantWaterCost(plant)}`
+        `> ðŸ’§ NÆ°á»›c: ${plantWaterCost(plant)}`
     );
 
     lines.push(
-        `> 💰 Bán: ${plantSellPrice(plant)} Mora`
+        `> ðŸ’° BÃ¡n: ${plantSellPrice(plant)} Mora`
     );
 
     lines.push(
-        `> 🌱 Giá hạt: ${getSeedPrice(plant).toLocaleString()} Mora`
+        `> ðŸŒ± GiÃ¡ háº¡t: ${getSeedPrice(plant).toLocaleString()} Mora`
     );
 
     if (
@@ -267,7 +267,7 @@ function plantDetailEmbed(
         lines.push("");
 
         lines.push(
-            `✨ Mutation: **${plant.mutation_emoji || "✨"} ${plant.mutation_name}**`
+            `âœ¨ Mutation: **${plant.mutation_emoji || "âœ¨"} ${plant.mutation_name}**`
         );
     }
 
@@ -276,7 +276,7 @@ function plantDetailEmbed(
         lines.push("");
 
         lines.push(
-            "🧬 **GENETICS**"
+            "ðŸ§¬ **GENETICS**"
         );
 
         lines.push(
@@ -325,9 +325,9 @@ function farmEmbedView(
         );
 
     const lines = [
-        `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+        `\`${user.username}\` â€” **Lv.${getUser(user).level}**`,
         "",
-        "🌱 **NÔNG TRẠI**",
+        "ðŸŒ± **NÃ”NG TRáº I**",
         ""
     ];
 
@@ -340,7 +340,7 @@ function farmEmbedView(
         ) {
 
             lines.push(
-                `🟫 **Ô ${plot.plot_id}** — Trống`
+                `ðŸŸ« **Ã” ${plot.plot_id}** â€” Trá»‘ng`
             );
 
             continue;
@@ -354,7 +354,7 @@ function farmEmbedView(
         if (!plant) {
 
             lines.push(
-                `🟫 **Ô ${plot.plot_id}** — Dữ liệu cây lỗi`
+                `ðŸŸ« **Ã” ${plot.plot_id}** â€” Dá»¯ liá»‡u cÃ¢y lá»—i`
             );
 
             continue;
@@ -365,7 +365,7 @@ function farmEmbedView(
         ) {
 
             lines.push(
-                `🌾 **Ô ${plot.plot_id}** — ${plantEmoji(plant)} **${plantName(plant)}** — **SẴN SÀNG THU HOẠCH!**`
+                `ðŸŒ¾ **Ã” ${plot.plot_id}** â€” ${plantEmoji(plant)} **${plantName(plant)}** â€” **Sáº´N SÃ€NG THU HOáº CH!**`
             );
 
         } else {
@@ -376,18 +376,18 @@ function farmEmbedView(
                 );
 
             lines.push(
-                `🌱 **Ô ${plot.plot_id}** — ${plantEmoji(plant)} **${plantName(plant)}** — <t:${finish}:R>`
+                `ðŸŒ± **Ã” ${plot.plot_id}** â€” ${plantEmoji(plant)} **${plantName(plant)}** â€” <t:${finish}:R>`
             );
         }
 
         lines.push(
-            `> 💧 ${plot.watered ? "Đã tưới" : "Chưa tưới"}`
+            `> ðŸ’§ ${plot.watered ? "ÄÃ£ tÆ°á»›i" : "ChÆ°a tÆ°á»›i"}`
         );
     }
 
     return farmEmbed({
         user,
-        title: "Nông Trại",
+        title: "NÃ´ng Tráº¡i",
         description:
             lines.join("\n"),
         color:
@@ -405,55 +405,55 @@ function helpEmbed(
 
     const text = [
 
-        `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+        `\`${user.username}\` â€” **Lv.${getUser(user).level}**`,
 
         "",
 
-        "🌱 **CƠ BẢN**",
+        "ðŸŒ± **CÆ  Báº¢N**",
 
-        "> `nstart` — mở trang chủ",
-        "> `nprofile` — xem hồ sơ",
-        "> `nfarm` — mở nông trại",
-        "> `ninv` — xem túi đồ",
-
-        "",
-
-        "🌾 **NÔNG TRẠI**",
-
-        "> Gieo hạt bằng nút 🌱",
-        "> Tưới nước bằng nút 💧",
-        "> Thu hoạch bằng nút 🌾",
-        "> Bắt sâu bằng nút 🐛",
+        "> `nstart` â€” má»Ÿ trang chá»§",
+        "> `nprofile` â€” xem há»“ sÆ¡",
+        "> `nfarm` â€” má»Ÿ nÃ´ng tráº¡i",
+        "> `ninv` â€” xem tÃºi Ä‘á»“",
 
         "",
 
-        "🛒 **CỬA HÀNG**",
+        "ðŸŒ¾ **NÃ”NG TRáº I**",
 
-        "> Shop có **5 loại hạt** riêng cho từng người.",
-        "> Shop tự đổi sau **30 phút**.",
-        "> Có **3 lần đổi shop miễn phí/ngày**.",
-        `> Sau 3 lần: **${SHOP_REFRESH_COST} Mora/lần**.`,
-        "> Chọn hạt → nhập số lượng muốn mua.",
-
-        "",
-
-        "🧬 **LAI TẠO**",
-
-        `> Chi phí: **${BREED_COST} Mora/lần**.`,
-        "> Chọn cây bố → chọn cây mẹ.",
-        "> Mỗi cây bố/mẹ tiêu hao 1 cây.",
-        "> Gene được kế thừa từ cả hai cây.",
-        "> Có cơ hội tạo Mutation hiếm.",
+        "> Gieo háº¡t báº±ng nÃºt ðŸŒ±",
+        "> TÆ°á»›i nÆ°á»›c báº±ng nÃºt ðŸ’§",
+        "> Thu hoáº¡ch báº±ng nÃºt ðŸŒ¾",
+        "> Báº¯t sÃ¢u báº±ng nÃºt ðŸ›",
 
         "",
 
-        "💡 Thời gian cây dùng đồng hồ Discord."
+        "ðŸ›’ **Cá»¬A HÃ€NG**",
+
+        "> Shop cÃ³ **5 loáº¡i háº¡t** riÃªng cho tá»«ng ngÆ°á»i.",
+        "> Shop tá»± Ä‘á»•i sau **30 phÃºt**.",
+        "> CÃ³ **3 láº§n Ä‘á»•i shop miá»…n phÃ­/ngÃ y**.",
+        `> Sau 3 láº§n: **${SHOP_REFRESH_COST} Mora/láº§n**.`,
+        "> Chá»n háº¡t â†’ nháº­p sá»‘ lÆ°á»£ng muá»‘n mua.",
+
+        "",
+
+        "ðŸ§¬ **LAI Táº O**",
+
+        `> Chi phÃ­: **${BREED_COST} Mora/láº§n**.`,
+        "> Chá»n cÃ¢y bá»‘ â†’ chá»n cÃ¢y máº¹.",
+        "> Má»—i cÃ¢y bá»‘/máº¹ tiÃªu hao 1 cÃ¢y.",
+        "> Gene Ä‘Æ°á»£c káº¿ thá»«a tá»« cáº£ hai cÃ¢y.",
+        "> CÃ³ cÆ¡ há»™i táº¡o Mutation hiáº¿m.",
+
+        "",
+
+        "ðŸ’¡ Thá»i gian cÃ¢y dÃ¹ng Ä‘á»“ng há»“ Discord."
     ].join("\n");
 
     return farmEmbed({
         user,
         title:
-            "Hướng Dẫn",
+            "HÆ°á»›ng Dáº«n",
         description:
             text,
         color:
@@ -470,3 +470,4 @@ module.exports = {
     farmEmbedView,
     helpEmbed
 };
+

@@ -1,4 +1,4 @@
-const {
+﻿const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
@@ -8,7 +8,7 @@ const {
 const { db } = require("../db");
 
 const plantDatabase =
-    require("../../database/plants");
+    require("../database/plants");
 
 const {
     COLORS,
@@ -52,16 +52,16 @@ const {
 // CONSTANTS
 // ============================================================
 
-// Gene trong database của cây gốc: 10 -> 100
-// Khi tính toán sẽ chuyển về 0.1 -> 1.0.
+// Gene trong database cá»§a cÃ¢y gá»‘c: 10 -> 100
+// Khi tÃ­nh toÃ¡n sáº½ chuyá»ƒn vá» 0.1 -> 1.0.
 const GENE_MIN = 10;
 const GENE_MAX = 100;
 
-// Gene hybrid không được phép tăng vô hạn.
+// Gene hybrid khÃ´ng Ä‘Æ°á»£c phÃ©p tÄƒng vÃ´ háº¡n.
 const HYBRID_GENE_MIN = 15;
 const HYBRID_GENE_MAX = 100;
 
-// Chỉ số cuối cùng cũng có giới hạn.
+// Chá»‰ sá»‘ cuá»‘i cÃ¹ng cÅ©ng cÃ³ giá»›i háº¡n.
 const MAX_GROWTH_TIME = 7200;
 const MIN_GROWTH_TIME = 60;
 
@@ -123,7 +123,7 @@ function getGeneValue(
         return 50;
     }
 
-    // Hybrid lấy gene trực tiếp từ database.
+    // Hybrid láº¥y gene trá»±c tiáº¿p tá»« database.
     if (
         isHybridPlant(
             plant.id
@@ -158,7 +158,7 @@ function getGeneValue(
         );
     }
 
-    // Cây gốc lấy gene từ database/plants.js.
+    // CÃ¢y gá»‘c láº¥y gene tá»« database/plants.js.
     if (
         typeof plantDatabase.getGenes ===
         "function"
@@ -246,17 +246,17 @@ function geneticsEmbed(
 
     const lines = [
 
-        `\`${user.username}\` — **Lv.${data.level}**`,
+        `\`${user.username}\` â€” **Lv.${data.level}**`,
 
         "",
 
-        "🧬 **GENETICS**",
+        "ðŸ§¬ **GENETICS**",
 
-        "> Gene càng cao thì khả năng tương ứng càng tốt.",
+        "> Gene cÃ ng cao thÃ¬ kháº£ nÄƒng tÆ°Æ¡ng á»©ng cÃ ng tá»‘t.",
 
-        "> Gene được giới hạn để tránh chỉ số tăng vô hạn.",
+        "> Gene Ä‘Æ°á»£c giá»›i háº¡n Ä‘á»ƒ trÃ¡nh chá»‰ sá»‘ tÄƒng vÃ´ háº¡n.",
 
-        "> Lai nhiều đời sẽ có xu hướng ổn định quanh gene của bố mẹ.",
+        "> Lai nhiá»u Ä‘á»i sáº½ cÃ³ xu hÆ°á»›ng á»•n Ä‘á»‹nh quanh gene cá»§a bá»‘ máº¹.",
 
         ""
     ];
@@ -274,10 +274,10 @@ function geneticsEmbed(
         );
 
         lines.push(
-            `> G ${getGeneValue(plant, "growth").toFixed(0)} • ` +
-            `Y ${getGeneValue(plant, "yield").toFixed(0)} • ` +
-            `W ${getGeneValue(plant, "water").toFixed(0)} • ` +
-            `R ${getGeneValue(plant, "rarity").toFixed(0)} • ` +
+            `> G ${getGeneValue(plant, "growth").toFixed(0)} â€¢ ` +
+            `Y ${getGeneValue(plant, "yield").toFixed(0)} â€¢ ` +
+            `W ${getGeneValue(plant, "water").toFixed(0)} â€¢ ` +
+            `R ${getGeneValue(plant, "rarity").toFixed(0)} â€¢ ` +
             `M ${getGeneValue(plant, "mutation").toFixed(0)}`
         );
     }
@@ -353,7 +353,7 @@ function breedParentMenu(
                             .slice(0, 100),
 
                     description:
-                        `Có: ${count} • G ${getGeneValue(plant, "growth").toFixed(0)} • Y ${getGeneValue(plant, "yield").toFixed(0)}`
+                        `CÃ³: ${count} â€¢ G ${getGeneValue(plant, "growth").toFixed(0)} â€¢ Y ${getGeneValue(plant, "yield").toFixed(0)}`
                             .slice(0, 100),
 
                     value:
@@ -369,8 +369,8 @@ function breedParentMenu(
             )
             .setPlaceholder(
                 parentType === "a"
-                    ? "🌱 Chọn cây BỐ..."
-                    : "🌱 Chọn cây MẸ..."
+                    ? "ðŸŒ± Chá»n cÃ¢y Bá»..."
+                    : "ðŸŒ± Chá»n cÃ¢y Máº¸..."
             )
             .addOptions(
                 options
@@ -398,10 +398,10 @@ function breedParentMenu(
                             "home_genetics"
                         )
                         .setLabel(
-                            "Quay lại"
+                            "Quay láº¡i"
                         )
                         .setEmoji(
-                            "⬅️"
+                            "â¬…ï¸"
                         )
                         .setStyle(
                             ButtonStyle.Secondary
@@ -427,25 +427,25 @@ const breedingSessions =
 // ============================================================
 
 /*
- * Gene đời con KHÔNG lấy nguyên gene bố/mẹ rồi nhân tiếp.
+ * Gene Ä‘á»i con KHÃ”NG láº¥y nguyÃªn gene bá»‘/máº¹ rá»“i nhÃ¢n tiáº¿p.
  *
- * Ví dụ:
+ * VÃ­ dá»¥:
  *
  * A = 80
  * B = 90
  *
- * Trung bình = 85
+ * Trung bÃ¬nh = 85
  *
- * Sau đó có variance nhẹ.
+ * Sau Ä‘Ã³ cÃ³ variance nháº¹.
  *
- * Và kéo nhẹ về 50 để chống snowball.
+ * VÃ  kÃ©o nháº¹ vá» 50 Ä‘á»ƒ chá»‘ng snowball.
  *
- * Nhờ vậy:
+ * Nhá» váº­y:
  *
  * A + B -> ~85
  * C + D -> ~80-90
  *
- * chứ không thành:
+ * chá»© khÃ´ng thÃ nh:
  *
  * 80 -> 6400 -> 512000...
  */
@@ -476,7 +476,7 @@ function inheritGene(
             second
         ) / 2;
 
-    // Random nhẹ.
+    // Random nháº¹.
     const randomFactor =
         1 +
         (
@@ -491,10 +491,10 @@ function inheritGene(
         randomFactor;
 
     /*
-     * Regression về 50.
+     * Regression vá» 50.
      *
-     * Gene càng xa 50 thì càng bị kéo nhẹ về 50.
-     * Điều này cực kỳ quan trọng cho breeding nhiều đời.
+     * Gene cÃ ng xa 50 thÃ¬ cÃ ng bá»‹ kÃ©o nháº¹ vá» 50.
+     * Äiá»u nÃ y cá»±c ká»³ quan trá»ng cho breeding nhiá»u Ä‘á»i.
      */
 
     result =
@@ -534,12 +534,12 @@ function rollBreedingMutation(
         );
 
     /*
-     * Mutation base khoảng 3%.
+     * Mutation base khoáº£ng 3%.
      *
-     * Gene 50 -> khoảng 6%
-     * Gene 100 -> khoảng 9%
+     * Gene 50 -> khoáº£ng 6%
+     * Gene 100 -> khoáº£ng 9%
      *
-     * Không cho vượt quá 10%.
+     * KhÃ´ng cho vÆ°á»£t quÃ¡ 10%.
      */
 
     const chance =
@@ -554,7 +554,7 @@ function rollBreedingMutation(
 
     /*
      * Legendary:
-     * cực hiếm.
+     * cá»±c hiáº¿m.
      */
 
     if (
@@ -571,7 +571,7 @@ function rollBreedingMutation(
                 "Legendary Mutation",
 
             emoji:
-                "🌟",
+                "ðŸŒŸ",
 
             multiplier:
                 1.60
@@ -596,7 +596,7 @@ function rollBreedingMutation(
                 "Golden Mutation",
 
             emoji:
-                "✨",
+                "âœ¨",
 
             multiplier:
                 1.30
@@ -621,7 +621,7 @@ function rollBreedingMutation(
                 "Rare Mutation",
 
             emoji:
-                "💜",
+                "ðŸ’œ",
 
             multiplier:
                 1.15
@@ -637,24 +637,24 @@ function rollBreedingMutation(
 // ============================================================
 
 /*
- * Lấy tên "gốc" của hybrid.
+ * Láº¥y tÃªn "gá»‘c" cá»§a hybrid.
  *
- * Ví dụ:
+ * VÃ­ dá»¥:
  *
- * Bạc Hà
- * Hoa Ngọt
+ * Báº¡c HÃ 
+ * Hoa Ngá»t
  *
- * -> ["Bạc Hà", "Hoa Ngọt"]
+ * -> ["Báº¡c HÃ ", "Hoa Ngá»t"]
  *
- * Nếu:
+ * Náº¿u:
  *
- * (Bạc Hà + Hoa Ngọt) + Bạc Hà
+ * (Báº¡c HÃ  + Hoa Ngá»t) + Báº¡c HÃ 
  *
- * -> ["Bạc Hà", "Hoa Ngọt"]
+ * -> ["Báº¡c HÃ ", "Hoa Ngá»t"]
  *
- * Không còn:
+ * KhÃ´ng cÃ²n:
  *
- * "Giống Lai Giống Lai Bạc Hà Hoa Ngọt"
+ * "Giá»‘ng Lai Giá»‘ng Lai Báº¡c HÃ  Hoa Ngá»t"
  */
 
 function getPlantLineage(
@@ -723,8 +723,8 @@ function getPlantLineage(
     }
 
     /*
-     * Nếu hybrid cũ không có parent
-     * thì lấy tên nhưng loại prefix.
+     * Náº¿u hybrid cÅ© khÃ´ng cÃ³ parent
+     * thÃ¬ láº¥y tÃªn nhÆ°ng loáº¡i prefix.
      */
 
     if (!result.length) {
@@ -750,13 +750,13 @@ function cleanHybridName(
 ) {
 
     if (!name) {
-        return "Cây Lai";
+        return "CÃ¢y Lai";
     }
 
     return String(name)
 
         .replace(
-            /^Giống Lai\s*/i,
+            /^Giá»‘ng Lai\s*/i,
             ""
         )
 
@@ -793,11 +793,11 @@ function createHybridName(
             .filter(Boolean);
 
     /*
-     * Xóa tên trùng.
+     * XÃ³a tÃªn trÃ¹ng.
      *
-     * Bạc Hà + Hoa Ngọt + Bạc Hà
+     * Báº¡c HÃ  + Hoa Ngá»t + Báº¡c HÃ 
      *
-     * => Bạc Hà + Hoa Ngọt
+     * => Báº¡c HÃ  + Hoa Ngá»t
      */
 
     lineage =
@@ -808,7 +808,7 @@ function createHybridName(
         ];
 
     /*
-     * Không để tên quá dài.
+     * KhÃ´ng Ä‘á»ƒ tÃªn quÃ¡ dÃ i.
      */
 
     if (
@@ -831,7 +831,7 @@ function createHybridName(
                 "Hybrid Plant",
 
             nameVi:
-                "Cây Lai"
+                "CÃ¢y Lai"
         };
     }
 
@@ -845,17 +845,17 @@ function createHybridName(
                 `Hybrid ${lineage[0]}`,
 
             nameVi:
-                `Cây Lai ${lineage[0]}`
+                `CÃ¢y Lai ${lineage[0]}`
         };
     }
 
     return {
 
         name:
-            `Hybrid ${lineage.join(" × ")}`,
+            `Hybrid ${lineage.join(" Ã— ")}`,
 
         nameVi:
-            `Cây Lai ${lineage.join(" × ")}`
+            `CÃ¢y Lai ${lineage.join(" Ã— ")}`
     };
 }
 
@@ -895,9 +895,9 @@ function calculateHybridRarity(
         ) / 2;
 
     /*
-     * Gene chỉ ảnh hưởng rất nhẹ.
+     * Gene chá»‰ áº£nh hÆ°á»Ÿng ráº¥t nháº¹.
      *
-     * 50 gene = không thay đổi.
+     * 50 gene = khÃ´ng thay Ä‘á»•i.
      */
 
     const geneBonus =
@@ -1144,11 +1144,11 @@ function createHybridPlant(
     /*
      * Gene 50 = x1.00
      *
-     * Gene 100 = nhanh hơn khoảng 20%
+     * Gene 100 = nhanh hÆ¡n khoáº£ng 20%
      *
-     * Gene 10 = chậm hơn khoảng 20%
+     * Gene 10 = cháº­m hÆ¡n khoáº£ng 20%
      *
-     * Không bao giờ chia trực tiếp cho gene.
+     * KhÃ´ng bao giá» chia trá»±c tiáº¿p cho gene.
      */
 
     const growthModifier =
@@ -1181,9 +1181,9 @@ function createHybridPlant(
     // --------------------------------------------------------
 
     /*
-     * Gene chỉ ảnh hưởng tối đa khoảng ±20%.
+     * Gene chá»‰ áº£nh hÆ°á»Ÿng tá»‘i Ä‘a khoáº£ng Â±20%.
      *
-     * Mutation thêm tối đa 60%.
+     * Mutation thÃªm tá»‘i Ä‘a 60%.
      */
 
     const yieldModifier =
@@ -1231,9 +1231,9 @@ function createHybridPlant(
     // --------------------------------------------------------
 
     /*
-     * Gene water cao => tốn ít nước hơn.
+     * Gene water cao => tá»‘n Ã­t nÆ°á»›c hÆ¡n.
      *
-     * Chỉ dao động khoảng ±20%.
+     * Chá»‰ dao Ä‘á»™ng khoáº£ng Â±20%.
      */
 
     const waterModifier =
@@ -1266,17 +1266,17 @@ function createHybridPlant(
     // --------------------------------------------------------
 
     /*
-     * Đây là phần quan trọng nhất.
+     * ÄÃ¢y lÃ  pháº§n quan trá»ng nháº¥t.
      *
-     * KHÔNG:
+     * KHÃ”NG:
      *
      * baseSell * rarityGene
      *
-     * vì rarityGene 80/90/100 sẽ phá economy.
+     * vÃ¬ rarityGene 80/90/100 sáº½ phÃ¡ economy.
      *
-     * Chỉ lấy giá trung bình bố mẹ.
+     * Chá»‰ láº¥y giÃ¡ trung bÃ¬nh bá»‘ máº¹.
      *
-     * Gene rarity chỉ ảnh hưởng tối đa khoảng ±15%.
+     * Gene rarity chá»‰ áº£nh hÆ°á»Ÿng tá»‘i Ä‘a khoáº£ng Â±15%.
      */
 
     const rarityModifier =
@@ -1347,7 +1347,7 @@ function createHybridPlant(
     // --------------------------------------------------------
 
     let emoji =
-        "🌱";
+        "ðŸŒ±";
 
     if (mutation) {
 
@@ -1369,7 +1369,7 @@ function createHybridPlant(
         emoji =
             emojiA ||
             emojiB ||
-            "🌱";
+            "ðŸŒ±";
     }
 
 
@@ -1542,7 +1542,7 @@ async function breedPlants(
         return interaction.reply({
 
             content:
-                "❌ Cây bố và cây mẹ phải là hai cây khác nhau.",
+                "âŒ CÃ¢y bá»‘ vÃ  cÃ¢y máº¹ pháº£i lÃ  hai cÃ¢y khÃ¡c nhau.",
 
             ephemeral:
                 true
@@ -1573,7 +1573,7 @@ async function breedPlants(
         return interaction.reply({
 
             content:
-                "❌ Không tìm thấy cây bố hoặc cây mẹ.",
+                "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y bá»‘ hoáº·c cÃ¢y máº¹.",
 
             ephemeral:
                 true
@@ -1595,7 +1595,7 @@ async function breedPlants(
         return interaction.reply({
 
             content:
-                `❌ Bạn không còn **${plantName(parentA)}**.`,
+                `âŒ Báº¡n khÃ´ng cÃ²n **${plantName(parentA)}**.`,
 
             ephemeral:
                 true
@@ -1613,7 +1613,7 @@ async function breedPlants(
         return interaction.reply({
 
             content:
-                `❌ Bạn không còn **${plantName(parentB)}**.`,
+                `âŒ Báº¡n khÃ´ng cÃ²n **${plantName(parentB)}**.`,
 
             ephemeral:
                 true
@@ -1654,7 +1654,7 @@ async function breedPlants(
         return interaction.reply({
 
             content:
-                `⏳ Bạn cần chờ **${formatTime(remaining)}** trước khi lai tiếp.`,
+                `â³ Báº¡n cáº§n chá» **${formatTime(remaining)}** trÆ°á»›c khi lai tiáº¿p.`,
 
             ephemeral:
                 true
@@ -1674,7 +1674,7 @@ async function breedPlants(
         return interaction.reply({
 
             content:
-                `❌ Cần **${BREED_COST} Mora** để lai.`,
+                `âŒ Cáº§n **${BREED_COST} Mora** Ä‘á»ƒ lai.`,
 
             ephemeral:
                 true
@@ -1762,7 +1762,7 @@ async function breedPlants(
             return interaction.reply({
 
                 content:
-                    "❌ Bạn không đủ Mora.",
+                    "âŒ Báº¡n khÃ´ng Ä‘á»§ Mora.",
 
                 ephemeral:
                     true
@@ -1778,7 +1778,7 @@ async function breedPlants(
             return interaction.reply({
 
                 content:
-                    "❌ Một trong hai cây không còn trong túi.",
+                    "âŒ Má»™t trong hai cÃ¢y khÃ´ng cÃ²n trong tÃºi.",
 
                 ephemeral:
                     true
@@ -1809,7 +1809,7 @@ async function breedPlants(
     } catch (error) {
 
         /*
-         * Rollback nếu tạo hybrid lỗi.
+         * Rollback náº¿u táº¡o hybrid lá»—i.
          */
 
         addItem(
@@ -1855,15 +1855,15 @@ async function breedPlants(
 
     const result = [
 
-        `${parentA.emoji || "🌱"} **${plantName(parentA)}**`,
+        `${parentA.emoji || "ðŸŒ±"} **${plantName(parentA)}**`,
 
-        "        🧬 +",
+        "        ðŸ§¬ +",
 
-        `${parentB.emoji || "🌱"} **${plantName(parentB)}**`,
+        `${parentB.emoji || "ðŸŒ±"} **${plantName(parentB)}**`,
 
         "",
 
-        "        ↓",
+        "        â†“",
 
         "",
 
@@ -1871,21 +1871,21 @@ async function breedPlants(
 
         "",
 
-        `> ⭐ Độ hiếm: **${child.rarity.toFixed(2)} / 5**`,
+        `> â­ Äá»™ hiáº¿m: **${child.rarity.toFixed(2)} / 5**`,
 
-        `> 🧬 Gene: G ${child.growthGene.toFixed(0)} • Y ${child.yieldGene.toFixed(0)} • W ${child.waterGene.toFixed(0)} • R ${child.rarityGene.toFixed(0)} • M ${child.mutationGene.toFixed(0)}`,
+        `> ðŸ§¬ Gene: G ${child.growthGene.toFixed(0)} â€¢ Y ${child.yieldGene.toFixed(0)} â€¢ W ${child.waterGene.toFixed(0)} â€¢ R ${child.rarityGene.toFixed(0)} â€¢ M ${child.mutationGene.toFixed(0)}`,
 
-        `> ⏱️ Sinh trưởng: **${formatTime(child.growthTime)}**`,
+        `> â±ï¸ Sinh trÆ°á»Ÿng: **${formatTime(child.growthTime)}**`,
 
-        `> 🌾 Sản lượng: **${child.yieldMin}–${child.yieldMax}**`,
+        `> ðŸŒ¾ Sáº£n lÆ°á»£ng: **${child.yieldMin}â€“${child.yieldMax}**`,
 
-        `> 💧 Nước: **${child.waterCost}**`,
+        `> ðŸ’§ NÆ°á»›c: **${child.waterCost}**`,
 
-        `> 💰 Bán: **${child.sellPrice.toLocaleString()} Mora**`,
+        `> ðŸ’° BÃ¡n: **${child.sellPrice.toLocaleString()} Mora**`,
 
         "",
 
-        `> 🎒 Cây con đã được thêm vào túi.`
+        `> ðŸŽ’ CÃ¢y con Ä‘Ã£ Ä‘Æ°á»£c thÃªm vÃ o tÃºi.`
     ];
 
 
@@ -1903,7 +1903,7 @@ async function breedPlants(
 
             `> ${child.mutation.emoji} **${child.mutation.name}!**`,
 
-            `> ✨ Multiplier ×${child.mutation.multiplier}`
+            `> âœ¨ Multiplier Ã—${child.mutation.multiplier}`
         );
     }
 
@@ -1922,7 +1922,7 @@ async function breedPlants(
                     interaction.user,
 
                 title:
-                    "🧬 Lai Tạo Thành Công",
+                    "ðŸ§¬ Lai Táº¡o ThÃ nh CÃ´ng",
 
                 description:
                     result.join("\n"),
@@ -1942,10 +1942,10 @@ async function breedPlants(
                             "home_inventory"
                         )
                         .setLabel(
-                            "Túi đồ"
+                            "TÃºi Ä‘á»“"
                         )
                         .setEmoji(
-                            "🎒"
+                            "ðŸŽ’"
                         )
                         .setStyle(
                             ButtonStyle.Secondary
@@ -1956,10 +1956,10 @@ async function breedPlants(
                             "home_genetics"
                         )
                         .setLabel(
-                            "Lai tiếp"
+                            "Lai tiáº¿p"
                         )
                         .setEmoji(
-                            "🧬"
+                            "ðŸ§¬"
                         )
                         .setStyle(
                             ButtonStyle.Primary
@@ -1970,10 +1970,10 @@ async function breedPlants(
                             "home_farm"
                         )
                         .setLabel(
-                            "Nông trại"
+                            "NÃ´ng tráº¡i"
                         )
                         .setEmoji(
-                            "🌱"
+                            "ðŸŒ±"
                         )
                         .setStyle(
                             ButtonStyle.Success

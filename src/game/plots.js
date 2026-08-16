@@ -1,4 +1,4 @@
-const { db } = require("../db");
+﻿const { db } = require("../db");
 const { DEFAULT_PLOTS } = require("../config");
 const { now } = require("../utils/time");
 
@@ -114,3 +114,4 @@ module.exports = {
     getPlot,
     isReady
 };
+

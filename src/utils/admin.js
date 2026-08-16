@@ -1,4 +1,4 @@
-const { ADMIN_ID } = require("../config");
+﻿const { ADMIN_ID } = require("../config");
 
 // ============================================================
 // ADMIN
@@ -39,7 +39,7 @@ function adminError(message) {
 
     return message.reply({
         content:
-            "❌ Bạn không có quyền sử dụng lệnh Admin."
+            "âŒ Báº¡n khÃ´ng cÃ³ quyá»n sá»­ dá»¥ng lá»‡nh Admin."
     });
 }
 
@@ -47,8 +47,8 @@ function adminTargetError(message) {
 
     return message.reply({
         content:
-            "❌ Hãy mention người chơi cần chỉnh.\n\n" +
-            "Ví dụ:\n" +
+            "âŒ HÃ£y mention ngÆ°á»i chÆ¡i cáº§n chá»‰nh.\n\n" +
+            "VÃ­ dá»¥:\n" +
             "`nadmin mora @user 10000`"
     });
 }
@@ -60,3 +60,4 @@ module.exports = {
     adminError,
     adminTargetError
 };
+

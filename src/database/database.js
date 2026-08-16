@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // NAHIDA FARM - DATABASE.JS
 // SQLite database
 // Compatible with:
@@ -596,7 +596,7 @@ function hasMora(
 // Level 3 -> 200
 // ...
 //
-// Có thể thay công thức sau này.
+// CÃ³ thá»ƒ thay cÃ´ng thá»©c sau nÃ y.
 //
 
 function xpRequiredForLevel(level) {
@@ -1536,18 +1536,18 @@ function useFertilizer(
 // GARDEN UNLOCK SYSTEM
 // ============================================================
 //
-// 5 đất mặc định.
-// Tối đa 25 đất.
-// Mỗi lần mở thêm 1 ô.
-// Yêu cầu Level + Mora.
+// 5 Ä‘áº¥t máº·c Ä‘á»‹nh.
+// Tá»‘i Ä‘a 25 Ä‘áº¥t.
+// Má»—i láº§n má»Ÿ thÃªm 1 Ã´.
+// YÃªu cáº§u Level + Mora.
 //
-// Level yêu cầu:
+// Level yÃªu cáº§u:
 // slot 6  -> Lv.5
 // slot 7  -> Lv.8
 // slot 8  -> Lv.11
 // ...
 //
-// Mora tăng dần.
+// Mora tÄƒng dáº§n.
 //
 
 function getSlotUnlockRequirement(
@@ -2040,5 +2040,5 @@ module.exports = {
 // ============================================================
 
 console.log(
-    `✅ Nahida Farm SQLite loaded: ${DB_PATH}`
+    `âœ… Nahida Farm SQLite loaded: ${DB_PATH}`
 );

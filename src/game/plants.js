@@ -1,7 +1,6 @@
-const { db } = require("../db");
+﻿const { db } = require("../db");
 
-const plantDatabase =
-    require("../../database/plants");
+const plantDatabase = require("../database/plants");
 
 // ============================================================
 // PLANT HELPERS
@@ -54,7 +53,7 @@ function plantName(
 ) {
 
     if (!plant) {
-        return "Cây không xác định";
+        return "CÃ¢y khÃ´ng xÃ¡c Ä‘á»‹nh";
     }
 
     return (
@@ -72,7 +71,7 @@ function plantEmoji(
 
     return (
         plant?.emoji ||
-        "🌱"
+        "ðŸŒ±"
     );
 }
 
@@ -311,3 +310,4 @@ module.exports = {
     plantWaterCost,
     getSeedPrice
 };
+

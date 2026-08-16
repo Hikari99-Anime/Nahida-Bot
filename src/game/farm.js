@@ -1,4 +1,4 @@
-const {
+﻿const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -7,7 +7,7 @@ const {
 const { db } = require("../db");
 
 const plantDatabase =
-    require("../../database/plants");
+    require("../database/plants");
 
 const { COLORS } = require("../config");
 const { now, unixSeconds, formatTime } = require("../utils/time");
@@ -50,7 +50,7 @@ async function plantSeed(
 
         return interaction.reply({
             content:
-                "❌ Cây không tồn tại.",
+                "âŒ CÃ¢y khÃ´ng tá»“n táº¡i.",
             ephemeral: true
         });
     }
@@ -65,7 +65,7 @@ async function plantSeed(
 
         return interaction.reply({
             content:
-                "❌ Ô đất không tồn tại.",
+                "âŒ Ã” Ä‘áº¥t khÃ´ng tá»“n táº¡i.",
             ephemeral: true
         });
     }
@@ -76,7 +76,7 @@ async function plantSeed(
 
         return interaction.reply({
             content:
-                "❌ Ô đất này đang có cây.",
+                "âŒ Ã” Ä‘áº¥t nÃ y Ä‘ang cÃ³ cÃ¢y.",
             ephemeral: true
         });
     }
@@ -93,7 +93,7 @@ async function plantSeed(
 
         return interaction.reply({
             content:
-                `❌ Bạn không có hạt giống **${plantName(plant)}**.`,
+                `âŒ Báº¡n khÃ´ng cÃ³ háº¡t giá»‘ng **${plantName(plant)}**.`,
             ephemeral: true
         });
     }
@@ -110,7 +110,7 @@ async function plantSeed(
 
         return interaction.reply({
             content:
-                `❌ Không đủ nước. Cần **${water}** nước.`,
+                `âŒ KhÃ´ng Ä‘á»§ nÆ°á»›c. Cáº§n **${water}** nÆ°á»›c.`,
             ephemeral: true
         });
     }
@@ -181,14 +181,14 @@ async function plantSeed(
                     interaction.user,
 
                 title:
-                    "Gieo Hạt Thành Công",
+                    "Gieo Háº¡t ThÃ nh CÃ´ng",
 
                 description:
                     `${plantEmoji(plant)} **${plantName(plant)}**\n\n` +
-                    `> 🟫 Ô đất: **${plotId}**\n` +
-                    `> ⏱️ Thời gian: **${formatTime(growth)}**\n` +
-                    `> 💧 Đã dùng: **${water} nước**\n` +
-                    `> 🌱 Hoàn thành <t:${finish}:R>`,
+                    `> ðŸŸ« Ã” Ä‘áº¥t: **${plotId}**\n` +
+                    `> â±ï¸ Thá»i gian: **${formatTime(growth)}**\n` +
+                    `> ðŸ’§ ÄÃ£ dÃ¹ng: **${water} nÆ°á»›c**\n` +
+                    `> ðŸŒ± HoÃ n thÃ nh <t:${finish}:R>`,
 
                 color:
                     COLORS.green
@@ -205,10 +205,10 @@ async function plantSeed(
                             "home_farm"
                         )
                         .setLabel(
-                            "Xem nông trại"
+                            "Xem nÃ´ng tráº¡i"
                         )
                         .setEmoji(
-                            "🌱"
+                            "ðŸŒ±"
                         )
                         .setStyle(
                             ButtonStyle.Success
@@ -240,7 +240,7 @@ async function harvest(
 
         return interaction.reply({
             content:
-                "❌ Ô đất này không có cây.",
+                "âŒ Ã” Ä‘áº¥t nÃ y khÃ´ng cÃ³ cÃ¢y.",
             ephemeral: true
         });
     }
@@ -261,7 +261,7 @@ async function harvest(
 
         return interaction.reply({
             content:
-                `⏳ Cây chưa trưởng thành. Còn **${formatTime(remaining)}**.`,
+                `â³ CÃ¢y chÆ°a trÆ°á»Ÿng thÃ nh. CÃ²n **${formatTime(remaining)}**.`,
             ephemeral: true
         });
     }
@@ -275,7 +275,7 @@ async function harvest(
 
         return interaction.reply({
             content:
-                "❌ Dữ liệu cây không còn tồn tại.",
+                "âŒ Dá»¯ liá»‡u cÃ¢y khÃ´ng cÃ²n tá»“n táº¡i.",
             ephemeral: true
         });
     }
@@ -386,16 +386,16 @@ async function harvest(
 
     let result =
         `${plantEmoji(plant)} **${plantName(plant)}**\n\n` +
-        `> 🌾 Thu hoạch: **×${amount}**\n` +
-        `> 💰 Nhận: **${total.toLocaleString()} Mora**\n` +
-        `> ✨ +25 EXP`;
+        `> ðŸŒ¾ Thu hoáº¡ch: **Ã—${amount}**\n` +
+        `> ðŸ’° Nháº­n: **${total.toLocaleString()} Mora**\n` +
+        `> âœ¨ +25 EXP`;
 
     if (
         mutation
     ) {
 
         result +=
-            `\n> ${mutation.emoji || "✨"} **${mutation.name || mutation.id} Mutation!**`;
+            `\n> ${mutation.emoji || "âœ¨"} **${mutation.name || mutation.id} Mutation!**`;
     }
 
     return interaction.reply({
@@ -408,7 +408,7 @@ async function harvest(
                     interaction.user,
 
                 title:
-                    "Thu Hoạch",
+                    "Thu Hoáº¡ch",
 
                 description:
                     result,
@@ -428,10 +428,10 @@ async function harvest(
                             "home_farm"
                         )
                         .setLabel(
-                            "Nông trại"
+                            "NÃ´ng tráº¡i"
                         )
                         .setEmoji(
-                            "🌱"
+                            "ðŸŒ±"
                         )
                         .setStyle(
                             ButtonStyle.Success
@@ -442,10 +442,10 @@ async function harvest(
                             "home_profile"
                         )
                         .setLabel(
-                            "Hồ sơ"
+                            "Há»“ sÆ¡"
                         )
                         .setEmoji(
-                            "👤"
+                            "ðŸ‘¤"
                         )
                         .setStyle(
                             ButtonStyle.Primary
@@ -477,7 +477,7 @@ async function waterPlot(
 
         return interaction.reply({
             content:
-                "❌ Ô này chưa có cây.",
+                "âŒ Ã” nÃ y chÆ°a cÃ³ cÃ¢y.",
             ephemeral: true
         });
     }
@@ -488,7 +488,7 @@ async function waterPlot(
 
         return interaction.reply({
             content:
-                "💧 Cây này đã được tưới.",
+                "ðŸ’§ CÃ¢y nÃ y Ä‘Ã£ Ä‘Æ°á»£c tÆ°á»›i.",
             ephemeral: true
         });
     }
@@ -507,7 +507,7 @@ async function waterPlot(
 
         return interaction.reply({
             content:
-                "❌ Không tìm thấy cây.",
+                "âŒ KhÃ´ng tÃ¬m tháº¥y cÃ¢y.",
             ephemeral: true
         });
     }
@@ -529,7 +529,7 @@ async function waterPlot(
 
         return interaction.reply({
             content:
-                `❌ Không đủ nước. Cần **${cost}**.`,
+                `âŒ KhÃ´ng Ä‘á»§ nÆ°á»›c. Cáº§n **${cost}**.`,
             ephemeral: true
         });
     }
@@ -563,12 +563,12 @@ async function waterPlot(
                     interaction.user,
 
                 title:
-                    "Tưới Nước",
+                    "TÆ°á»›i NÆ°á»›c",
 
                 description:
-                    `💧 Bạn đã tưới cho cây ở **ô ${plotId}**.\n\n` +
-                    `> 💧 -${cost} nước\n` +
-                    `> 🌱 Cây tiếp tục phát triển.`,
+                    `ðŸ’§ Báº¡n Ä‘Ã£ tÆ°á»›i cho cÃ¢y á»Ÿ **Ã´ ${plotId}**.\n\n` +
+                    `> ðŸ’§ -${cost} nÆ°á»›c\n` +
+                    `> ðŸŒ± CÃ¢y tiáº¿p tá»¥c phÃ¡t triá»ƒn.`,
 
                 color:
                     COLORS.water
@@ -585,10 +585,10 @@ async function waterPlot(
                             "home_farm"
                         )
                         .setLabel(
-                            "Nông trại"
+                            "NÃ´ng tráº¡i"
                         )
                         .setEmoji(
-                            "🌱"
+                            "ðŸŒ±"
                         )
                         .setStyle(
                             ButtonStyle.Success
@@ -657,12 +657,12 @@ async function catchBug(
                     interaction.user,
 
                 title:
-                    "Bắt Sâu",
+                    "Báº¯t SÃ¢u",
 
                 description:
-                    `🐛 Bạn đã bắt được một con sâu trong vườn!\n\n` +
-                    `> 💰 Nhận **${reward} Mora**\n` +
-                    `> 🐛 Bắt sâu: **+1**`,
+                    `ðŸ› Báº¡n Ä‘Ã£ báº¯t Ä‘Æ°á»£c má»™t con sÃ¢u trong vÆ°á»n!\n\n` +
+                    `> ðŸ’° Nháº­n **${reward} Mora**\n` +
+                    `> ðŸ› Báº¯t sÃ¢u: **+1**`,
 
                 color:
                     COLORS.green
@@ -679,10 +679,10 @@ async function catchBug(
                             "home_farm"
                         )
                         .setLabel(
-                            "Quay lại vườn"
+                            "Quay láº¡i vÆ°á»n"
                         )
                         .setEmoji(
-                            "🌱"
+                            "ðŸŒ±"
                         )
                         .setStyle(
                             ButtonStyle.Success
@@ -698,3 +698,4 @@ module.exports = {
     waterPlot,
     catchBug
 };
+

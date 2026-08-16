@@ -1,26 +1,115 @@
-const {
+﻿const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     StringSelectMenuBuilder,
-    ModalBuilder,
-    TextInputBuilder,
-    TextInputStyle
+    StringSelectMenuOptionBuilder
 } = require("discord.js");
 
-const { db } = require("../db");
-
-const plantDatabase =
-    require("../../database/plants");
-
-const { BREED_COST } = require("../config");
-const { getUser } = require("../game/user");
-const { getPlots } = require("../game/plots");
 const {
-    plantName,
-    plantEmoji,
-    getSeedPrice
-} = require("../game/plants");
+    COLORS
+} = require("../config");
+
+const {
+    getAllPlants,
+    getPlant,
+    formatPlant,
+    getRarityStars
+} = require("../database/plants");
+
+const {
+    getUser
+} = require("../game/user");
+
+
+// ============================================================
+// SAFE EMOJI
+// ============================================================
+
+const EMOJI = {
+    home: "🏠",
+    farm: "🌱",
+    inventory: "🎒",
+    shop: "🛒",
+    genetics: "🧬",
+    help: "❓",
+
+    plant: "🌱",
+    water: "💧",
+    harvest: "🌾",
+    bug: "🐛",
+
+    back: "◀️",
+    refresh: "🔄",
+    confirm: "✅",
+    cancel: "❌",
+
+    seed: "🌰",
+    money: "💰",
+    level: "⭐",
+    info: "ℹ️",
+
+    common: "⚪",
+    uncommon: "🟢",
+    rare: "🔵",
+    epic: "🟣",
+    legendary: "🟠",
+    mythic: "🔴"
+};
+
+
+// ============================================================
+// HELPER
+// ============================================================
+
+function safePlantEmoji(plant) {
+
+    if (
+        !plant ||
+        typeof plant.emoji !== "string"
+    ) {
+        return EMOJI.plant;
+    }
+
+    const emoji =
+        plant.emoji.trim();
+
+    if (!emoji) {
+        return EMOJI.plant;
+    }
+
+    return emoji;
+}
+
+
+function plantName(plant) {
+
+    if (!plant) {
+        return "Cây không xác định";
+    }
+
+    return (
+        plant.nameVi ||
+        plant.viName ||
+        plant.name ||
+        plant.id ||
+        "Cây"
+    );
+}
+
+
+function plantDescription(plant) {
+
+    if (!plant) {
+        return "";
+    }
+
+    return (
+        plant.description ||
+        "Một giống cây trong Nahida Farm."
+    );
+}
+
 
 // ============================================================
 // MAIN BUTTONS
@@ -34,95 +123,48 @@ function mainButtons() {
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_farm"
-                    )
-                    .setLabel(
-                        "Nông trại"
-                    )
-                    .setEmoji(
-                        "🌱"
-                    )
+                    .setCustomId("home_farm")
+                    .setLabel("Nông trại")
+                    .setEmoji(EMOJI.farm)
                     .setStyle(
                         ButtonStyle.Success
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_profile"
-                    )
-                    .setLabel(
-                        "Hồ sơ"
-                    )
-                    .setEmoji(
-                        "👤"
-                    )
-                    .setStyle(
-                        ButtonStyle.Primary
-                    ),
-
-                new ButtonBuilder()
-                    .setCustomId(
-                        "home_inventory"
-                    )
-                    .setLabel(
-                        "Túi đồ"
-                    )
-                    .setEmoji(
-                        "🎒"
-                    )
+                    .setCustomId("home_inventory")
+                    .setLabel("Túi đồ")
+                    .setEmoji(EMOJI.inventory)
                     .setStyle(
                         ButtonStyle.Secondary
-                    )
-            ),
-
-        new ActionRowBuilder()
-            .addComponents(
+                    ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_shop"
-                    )
-                    .setLabel(
-                        "Cửa hàng"
-                    )
-                    .setEmoji(
-                        "🛒"
-                    )
+                    .setCustomId("home_shop")
+                    .setLabel("Cửa hàng")
+                    .setEmoji(EMOJI.shop)
                     .setStyle(
                         ButtonStyle.Primary
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_genetics"
-                    )
-                    .setLabel(
-                        "Lai tạo"
-                    )
-                    .setEmoji(
-                        "🧬"
-                    )
+                    .setCustomId("home_genetics")
+                    .setLabel("Di truyền")
+                    .setEmoji(EMOJI.genetics)
                     .setStyle(
                         ButtonStyle.Primary
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_help"
-                    )
-                    .setLabel(
-                        "Hướng dẫn"
-                    )
-                    .setEmoji(
-                        "📖"
-                    )
+                    .setCustomId("home_help")
+                    .setLabel("Trợ giúp")
+                    .setEmoji(EMOJI.help)
                     .setStyle(
                         ButtonStyle.Secondary
                     )
             )
     ];
 }
+
 
 // ============================================================
 // FARM BUTTONS
@@ -136,59 +178,35 @@ function farmButtons() {
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_plant"
-                    )
-                    .setLabel(
-                        "Gieo hạt"
-                    )
-                    .setEmoji(
-                        "🌱"
-                    )
+                    .setCustomId("farm_plant")
+                    .setLabel("Gieo hạt")
+                    .setEmoji(EMOJI.plant)
                     .setStyle(
                         ButtonStyle.Success
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_water"
-                    )
-                    .setLabel(
-                        "Tưới nước"
-                    )
-                    .setEmoji(
-                        "💧"
-                    )
+                    .setCustomId("farm_water")
+                    .setLabel("Tưới nước")
+                    .setEmoji(EMOJI.water)
                     .setStyle(
                         ButtonStyle.Primary
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_harvest"
-                    )
-                    .setLabel(
-                        "Thu hoạch"
-                    )
-                    .setEmoji(
-                        "🌾"
-                    )
+                    .setCustomId("farm_harvest")
+                    .setLabel("Thu hoạch")
+                    .setEmoji(EMOJI.harvest)
                     .setStyle(
                         ButtonStyle.Success
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "farm_bug"
-                    )
-                    .setLabel(
-                        "Bắt sâu"
-                    )
-                    .setEmoji(
-                        "🐛"
-                    )
+                    .setCustomId("farm_bug")
+                    .setLabel("Bắt sâu")
+                    .setEmoji(EMOJI.bug)
                     .setStyle(
-                        ButtonStyle.Secondary
+                        ButtonStyle.Danger
                     )
             ),
 
@@ -196,43 +214,9 @@ function farmButtons() {
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_profile"
-                    )
-                    .setLabel(
-                        "Hồ sơ"
-                    )
-                    .setEmoji(
-                        "👤"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    ),
-
-                new ButtonBuilder()
-                    .setCustomId(
-                        "home_inventory"
-                    )
-                    .setLabel(
-                        "Túi đồ"
-                    )
-                    .setEmoji(
-                        "🎒"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    ),
-
-                new ButtonBuilder()
-                    .setCustomId(
-                        "home"
-                    )
-                    .setLabel(
-                        "Trang chủ"
-                    )
-                    .setEmoji(
-                        "🏠"
-                    )
+                    .setCustomId("home")
+                    .setLabel("Trang chủ")
+                    .setEmoji(EMOJI.home)
                     .setStyle(
                         ButtonStyle.Secondary
                     )
@@ -240,8 +224,9 @@ function farmButtons() {
     ];
 }
 
+
 // ============================================================
-// BACK
+// BACK BUTTON
 // ============================================================
 
 function backButton() {
@@ -252,15 +237,9 @@ function backButton() {
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home"
-                    )
-                    .setLabel(
-                        "Trang chủ"
-                    )
-                    .setEmoji(
-                        "🏠"
-                    )
+                    .setCustomId("home")
+                    .setLabel("Trang chủ")
+                    .setEmoji(EMOJI.home)
                     .setStyle(
                         ButtonStyle.Secondary
                     )
@@ -268,271 +247,9 @@ function backButton() {
     ];
 }
 
-// ============================================================
-// SHOP REFRESH BUTTON
-// ============================================================
-
-function shopRefreshButton() {
-
-    return new ButtonBuilder()
-        .setCustomId(
-            "shop_refresh"
-        )
-        .setLabel(
-            "Đổi shop"
-        )
-        .setEmoji(
-            "🔄"
-        )
-        .setStyle(
-            ButtonStyle.Primary
-        );
-}
 
 // ============================================================
-// SHOP MODAL
-// ============================================================
-
-function shopQuantityModal(
-    plant
-) {
-
-    const modal =
-        new ModalBuilder()
-            .setCustomId(
-                `shop_quantity_${plant.id}`
-            )
-            .setTitle(
-                `Mua ${plantName(plant)}`.slice(
-                    0,
-                    45
-                )
-            );
-
-    const input =
-        new TextInputBuilder()
-            .setCustomId(
-                "quantity"
-            )
-            .setLabel(
-                "Bạn muốn mua bao nhiêu hạt?"
-            )
-            .setPlaceholder(
-                "Ví dụ: 1, 5, 10, 50..."
-            )
-            .setStyle(
-                TextInputStyle.Short
-            )
-            .setRequired(
-                true
-            )
-            .setMinLength(
-                1
-            )
-            .setMaxLength(
-                4
-            )
-            .setValue(
-                "1"
-            );
-
-    modal.addComponents(
-        new ActionRowBuilder()
-            .addComponents(
-                input
-            )
-    );
-
-    return modal;
-}
-
-// ============================================================
-// PLANT SELECT
-// ============================================================
-
-function plantSelectMenu(
-    user
-) {
-
-    const data =
-        getUser(user);
-
-    let plants =
-        [];
-
-    if (
-        typeof plantDatabase.getAvailablePlants ===
-        "function"
-    ) {
-
-        plants =
-            plantDatabase
-                .getAvailablePlants(
-                    data.level
-                );
-    }
-
-    const hybridPlants =
-        db.prepare(`
-            SELECT *
-            FROM bred_plants
-            WHERE user_id = ?
-            ORDER BY created_at DESC
-            LIMIT 25
-        `).all(
-            user.id
-        );
-
-    plants =
-        [
-            ...plants,
-            ...hybridPlants
-        ].slice(
-            0,
-            25
-        );
-
-    const options =
-        plants.map(
-            plant => ({
-
-                label:
-                    `${plantEmoji(plant)} ${plantName(plant)}`
-                        .slice(
-                            0,
-                            100
-                        ),
-
-                description:
-                    `${plant.region || "Hybrid"} • ${getSeedPrice(plant).toLocaleString()} Mora`
-                        .slice(
-                            0,
-                            100
-                        ),
-
-                value:
-                    plant.id
-            })
-        );
-
-    if (!options.length) {
-        return null;
-    }
-
-    const menu =
-        new StringSelectMenuBuilder()
-            .setCustomId(
-                "select_plant"
-            )
-            .setPlaceholder(
-                "🌱 Chọn hạt giống..."
-            )
-            .addOptions(
-                options
-            );
-
-    return [
-
-        new ActionRowBuilder()
-            .addComponents(
-                menu
-            ),
-
-        new ActionRowBuilder()
-            .addComponents(
-
-                new ButtonBuilder()
-                    .setCustomId(
-                        "home_farm"
-                    )
-                    .setLabel(
-                        "Quay lại"
-                    )
-                    .setEmoji(
-                        "⬅️"
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    )
-            )
-    ];
-}
-
-// ============================================================
-// PLOT SELECT
-// ============================================================
-
-function plotSelect(
-    userId,
-    plantId
-) {
-
-    const plots =
-        getPlots(
-            userId
-        );
-
-    const available =
-        plots.filter(
-            p =>
-                !p.plant_id
-        );
-
-    const rows =
-        [];
-
-    let row =
-        new ActionRowBuilder();
-
-    for (
-        const plot of available
-    ) {
-
-        row.addComponents(
-
-            new ButtonBuilder()
-                .setCustomId(
-                    `plant_${plantId}_${plot.plot_id}`
-                )
-                .setLabel(
-                    `Ô ${plot.plot_id}`
-                )
-                .setEmoji(
-                    "🟫"
-                )
-                .setStyle(
-                    ButtonStyle.Success
-                )
-        );
-
-        if (
-            row.components.length >=
-            5
-        ) {
-
-            rows.push(
-                row
-            );
-
-            row =
-                new ActionRowBuilder();
-        }
-    }
-
-    if (
-        row.components.length
-    ) {
-
-        rows.push(
-            row
-        );
-    }
-
-    return rows;
-}
-
-// ============================================================
-// BREED START
+// GENETICS BUTTONS
 // ============================================================
 
 function geneticsButtons() {
@@ -543,57 +260,29 @@ function geneticsButtons() {
             .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "breed_start"
-                    )
-                    .setLabel(
-                        "Lai cây"
-                    )
-                    .setEmoji(
-                        "🧬"
-                    )
+                    .setCustomId("breed_start")
+                    .setLabel("Lai cây")
+                    .setEmoji(EMOJI.genetics)
                     .setStyle(
                         ButtonStyle.Primary
                     ),
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "genetics_info"
-                    )
-                    .setLabel(
-                        "Thông tin"
-                    )
-                    .setEmoji(
-                        "📖"
-                    )
+                    .setCustomId("genetics_info")
+                    .setLabel("Thông tin")
+                    .setEmoji(EMOJI.info)
                     .setStyle(
                         ButtonStyle.Secondary
-                    ),
+                    )
+            ),
+
+        new ActionRowBuilder()
+            .addComponents(
 
                 new ButtonBuilder()
-                    .setCustomId(
-                        "home_farm"
-                    )
-                    .setLabel(
-                        "Nông trại"
-                    )
-                    .setEmoji(
-                        "🌱"
-                    )
-                    .setStyle(
-                        ButtonStyle.Success
-                    ),
-
-                new ButtonBuilder()
-                    .setCustomId(
-                        "home"
-                    )
-                    .setLabel(
-                        "Trang chủ"
-                    )
-                    .setEmoji(
-                        "🏠"
-                    )
+                    .setCustomId("home")
+                    .setLabel("Trang chủ")
+                    .setEmoji(EMOJI.home)
                     .setStyle(
                         ButtonStyle.Secondary
                     )
@@ -601,11 +290,251 @@ function geneticsButtons() {
     ];
 }
 
+
 // ============================================================
-// BREED CONFIRM BUTTON
+// SHOP SELECT
 // ============================================================
 
-function breedConfirmButtons() {
+function shopSelectMenu(user) {
+
+    const plants =
+        getAllPlants();
+
+    if (!plants.length) {
+        return backButton();
+    }
+
+    const options =
+        plants
+            .slice(0, 25)
+            .map(plant => {
+
+                const option =
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(
+                            plantName(plant)
+                                .slice(0, 100)
+                        )
+                        .setValue(
+                            String(plant.id)
+                                .slice(0, 100)
+                        )
+                        .setDescription(
+                            `${getRarityStars(plant.rarity)} • Hạt giống: ${Number(plant.seedPrice || 0)} Mora`
+                                .slice(0, 100)
+                        );
+
+                const emoji =
+                    safePlantEmoji(plant);
+
+                if (emoji) {
+                    option.setEmoji(emoji);
+                }
+
+                return option;
+            });
+
+    const menu =
+        new StringSelectMenuBuilder()
+            .setCustomId("shop_buy")
+            .setPlaceholder("🌱 Chọn hạt giống muốn mua")
+            .addOptions(options);
+
+    return [
+
+        new ActionRowBuilder()
+            .addComponents(menu),
+
+        new ActionRowBuilder()
+            .addComponents(
+
+                new ButtonBuilder()
+                    .setCustomId("shop_refresh")
+                    .setLabel("Làm mới")
+                    .setEmoji(EMOJI.refresh)
+                    .setStyle(
+                        ButtonStyle.Secondary
+                    ),
+
+                new ButtonBuilder()
+                    .setCustomId("home")
+                    .setLabel("Trang chủ")
+                    .setEmoji(EMOJI.home)
+                    .setStyle(
+                        ButtonStyle.Secondary
+                    )
+            )
+    ];
+}
+
+
+// ============================================================
+// PLANT SELECT MENU
+// ============================================================
+
+function plantSelectMenu(user) {
+
+    const plants =
+        getAllPlants();
+
+    if (!plants.length) {
+        return backButton();
+    }
+
+    let available =
+        plants;
+
+    try {
+
+        const userData =
+            getUser(user);
+
+        const level =
+            Number(
+                userData?.level ||
+                userData?.profile?.level ||
+                1
+            );
+
+        available =
+            plants.filter(
+                plant =>
+                    Number(
+                        plant.unlockLevel || 1
+                    ) <= level
+            );
+
+    } catch {
+
+        available =
+            plants;
+    }
+
+    if (!available.length) {
+        return backButton();
+    }
+
+    /*
+     * Discord giới hạn select menu 25 option.
+     */
+    const options =
+        available
+            .slice(0, 25)
+            .map(plant => {
+
+                const option =
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(
+                            plantName(plant)
+                                .slice(0, 100)
+                        )
+                        .setValue(
+                            String(plant.id)
+                                .slice(0, 100)
+                        )
+                        .setDescription(
+                            `Hạt giống: ${Number(plant.seedPrice || 0)} Mora • ${getRarityStars(plant.rarity)}`
+                                .slice(0, 100)
+                        );
+
+                const emoji =
+                    safePlantEmoji(plant);
+
+                if (emoji) {
+                    option.setEmoji(emoji);
+                }
+
+                return option;
+            });
+
+    const menu =
+        new StringSelectMenuBuilder()
+            .setCustomId("farm_plant_select")
+            .setPlaceholder("🌱 Chọn giống cây")
+            .addOptions(options);
+
+    return [
+
+        new ActionRowBuilder()
+            .addComponents(menu),
+
+        ...backButton()
+    ];
+}
+
+
+// ============================================================
+// PLOT SELECT
+// ============================================================
+
+function plotSelect(
+    plots = []
+) {
+
+    if (!Array.isArray(plots)) {
+        plots = [];
+    }
+
+    const options =
+        plots
+            .slice(0, 25)
+            .map(plot => {
+
+                const id =
+                    Number(
+                        plot.plot_id ??
+                        plot.id ??
+                        0
+                    );
+
+                return new StringSelectMenuOptionBuilder()
+                    .setLabel(
+                        `Ô đất ${id}`
+                    )
+                    .setValue(
+                        String(id)
+                    )
+                    .setDescription(
+                        plot.plant_id
+                            ? `Đang trồng: ${plot.plant_id}`
+                            : "Ô đất trống"
+                    );
+            });
+
+    if (!options.length) {
+        return backButton();
+    }
+
+    const menu =
+        new StringSelectMenuBuilder()
+            .setCustomId("plot_select")
+            .setPlaceholder("Chọn ô đất")
+            .addOptions(options);
+
+    return [
+
+        new ActionRowBuilder()
+            .addComponents(menu),
+
+        ...backButton()
+    ];
+}
+
+
+// ============================================================
+// PLANT DETAIL BUTTONS
+// ============================================================
+
+function plantDetailButtons(
+    plantId
+) {
+
+    const plant =
+        getPlant(plantId);
+
+    if (!plant) {
+        return backButton();
+    }
 
     return [
 
@@ -614,43 +543,50 @@ function breedConfirmButtons() {
 
                 new ButtonBuilder()
                     .setCustomId(
-                        "breed_confirm"
+                        `plant_info_${plant.id}`
                     )
-                    .setLabel(
-                        `Xác nhận lai • ${BREED_COST} Mora`
-                    )
-                    .setEmoji(
-                        "🧬"
-                    )
+                    .setLabel("Thông tin")
+                    .setEmoji(EMOJI.info)
                     .setStyle(
-                        ButtonStyle.Success
+                        ButtonStyle.Secondary
                     ),
 
                 new ButtonBuilder()
                     .setCustomId(
-                        "breed_cancel"
+                        `buy_${plant.id}`
                     )
-                    .setLabel(
-                        "Hủy"
-                    )
-                    .setEmoji(
-                        "❌"
-                    )
+                    .setLabel("Mua hạt")
+                    .setEmoji(EMOJI.seed)
                     .setStyle(
-                        ButtonStyle.Danger
+                        ButtonStyle.Success
                     )
-            )
+            ),
+
+        ...backButton()
     ];
 }
 
+
+// ============================================================
+// EXPORT
+// ============================================================
+
 module.exports = {
+
+    EMOJI,
+
     mainButtons,
     farmButtons,
     backButton,
-    shopRefreshButton,
     geneticsButtons,
-    breedConfirmButtons,
-    shopQuantityModal,
+
+    shopSelectMenu,
     plantSelectMenu,
-    plotSelect
+    plotSelect,
+
+    plantDetailButtons,
+
+    safePlantEmoji,
+    plantName,
+    plantDescription
 };
