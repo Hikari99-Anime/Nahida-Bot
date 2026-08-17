@@ -18,8 +18,10 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /root/Nahida-bot
+            cp .env /root/.env.nahida.deploy-backup
             git stash --include-untracked
             git pull origin main
             git stash pop || true
+            cp /root/.env.nahida.deploy-backup .env
             npm install
             pm2 restart nahida-bot
