@@ -1,14 +1,32 @@
-const {
+﻿const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
 } = require("discord.js");
 
 const { COLORS, BREED_COST } = require("../config");
-const { getPlant, plantName, plantEmoji } = require("../game/plants");
-const { getItemCount } = require("../game/inventory");
-const { getPlots, isReady } = require("../game/plots");
-const { plantSeed, harvest, waterPlot, catchBug } = require("../game/farm");
+
+const {
+    getPlant,
+    plantName,
+    plantEmoji
+} = require("../game/plants");
+
+const {
+    getItemCount
+} = require("../game/inventory");
+
+const {
+    getPlots,
+    isReady
+} = require("../game/plots");
+
+const {
+    plantSeed,
+    harvest,
+    waterPlot,
+    catchBug
+} = require("../game/farm");
 
 const {
     getShopPlants,
@@ -47,6 +65,7 @@ const {
     shopQuantityModal
 } = require("../ui/components");
 
+
 // ============================================================
 // INTERACTIONS
 // ============================================================
@@ -76,16 +95,14 @@ module.exports = (client) => {
                     }
 
                     const plantId =
-                        interaction.customId
-                            .slice(
-                                "shop_quantity_".length
-                            );
+                        interaction.customId.slice(
+                            "shop_quantity_".length
+                        );
 
                     const quantity =
-                        interaction.fields
-                            .getTextInputValue(
-                                "quantity"
-                            );
+                        interaction.fields.getTextInputValue(
+                            "quantity"
+                        );
 
                     return buySeeds(
                         interaction,
@@ -93,6 +110,7 @@ module.exports = (client) => {
                         quantity
                     );
                 }
+
 
                 // ========================================================
                 // SELECT MENU
@@ -102,7 +120,10 @@ module.exports = (client) => {
                     interaction.isStringSelectMenu()
                 ) {
 
+                    // ====================================================
                     // SHOP
+                    // ====================================================
+
                     if (
                         interaction.customId ===
                         "shop_buy"
@@ -134,8 +155,7 @@ module.exports = (client) => {
                         if (
                             !shopPlants.some(
                                 p =>
-                                    p.id ===
-                                    plant.id
+                                    p.id === plant.id
                             )
                         ) {
 
@@ -154,7 +174,11 @@ module.exports = (client) => {
                         );
                     }
 
+
+                    // ====================================================
                     // PLANT
+                    // ====================================================
+
                     if (
                         interaction.customId ===
                         "select_plant"
@@ -200,7 +224,11 @@ module.exports = (client) => {
                         });
                     }
 
-                    // BREED PARENT
+
+                    // ====================================================
+                    // BREED PARENT A
+                    // ====================================================
+
                     if (
                         interaction.customId ===
                         "breed_parent_a"
@@ -224,17 +252,11 @@ module.exports = (client) => {
                             });
                         }
 
-                        const session =
-                            breedingSessions.get(
-                                `select:${interaction.user.id}`
-                            ) || {};
-
                         breedingSessions.set(
                             `select:${interaction.user.id}`,
                             {
                                 parentA,
-                                parentB:
-                                    null
+                                parentB: null
                             }
                         );
 
@@ -270,6 +292,11 @@ module.exports = (client) => {
                                 backButton()
                         });
                     }
+
+
+                    // ====================================================
+                    // BREED PARENT B
+                    // ====================================================
 
                     if (
                         interaction.customId ===
@@ -363,6 +390,7 @@ module.exports = (client) => {
                             {
                                 parentA:
                                     parentA.id,
+
                                 parentB:
                                     parentBPlant.id
                             }
@@ -401,6 +429,7 @@ module.exports = (client) => {
                     return;
                 }
 
+
                 // ========================================================
                 // BUTTON
                 // ========================================================
@@ -413,6 +442,7 @@ module.exports = (client) => {
 
                 const id =
                     interaction.customId;
+
 
                 // ========================================================
                 // HOME
@@ -435,6 +465,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // PROFILE
                 // ========================================================
@@ -452,6 +483,7 @@ module.exports = (client) => {
                         ],
 
                         components: [
+
                             new ActionRowBuilder()
                                 .addComponents(
 
@@ -501,6 +533,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // FARM
                 // ========================================================
@@ -522,6 +555,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // INVENTORY
                 // ========================================================
@@ -542,6 +576,7 @@ module.exports = (client) => {
                             mainButtons()
                     });
                 }
+
 
                 // ========================================================
                 // SHOP
@@ -566,6 +601,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // SHOP REFRESH
                 // ========================================================
@@ -578,6 +614,7 @@ module.exports = (client) => {
                         interaction
                     );
                 }
+
 
                 // ========================================================
                 // GENETICS
@@ -600,6 +637,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // HELP
                 // ========================================================
@@ -620,6 +658,7 @@ module.exports = (client) => {
                             mainButtons()
                     });
                 }
+
 
                 // ========================================================
                 // FARM PLANT
@@ -656,6 +695,7 @@ module.exports = (client) => {
                             backButton()
                     });
                 }
+
 
                 // ========================================================
                 // WATER
@@ -750,6 +790,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // HARVEST
                 // ========================================================
@@ -843,6 +884,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // BUG
                 // ========================================================
@@ -855,6 +897,7 @@ module.exports = (client) => {
                         interaction
                     );
                 }
+
 
                 // ========================================================
                 // GENETICS INFO
@@ -877,6 +920,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // BREED START
                 // ========================================================
@@ -891,8 +935,7 @@ module.exports = (client) => {
                         );
 
                     if (
-                        plants.length <
-                        2
+                        plants.length < 2
                     ) {
 
                         return interaction.reply({
@@ -938,6 +981,7 @@ module.exports = (client) => {
                     });
                 }
 
+
                 // ========================================================
                 // BREED CONFIRM
                 // ========================================================
@@ -978,6 +1022,7 @@ module.exports = (client) => {
                     );
                 }
 
+
                 // ========================================================
                 // BREED CANCEL
                 // ========================================================
@@ -1002,6 +1047,7 @@ module.exports = (client) => {
                             geneticsButtons()
                     });
                 }
+
 
                 // ========================================================
                 // PLANT TO PLOT
@@ -1033,6 +1079,7 @@ module.exports = (client) => {
                     );
                 }
 
+
                 // ========================================================
                 // WATER PLOT
                 // ========================================================
@@ -1045,9 +1092,7 @@ module.exports = (client) => {
 
                     const plotId =
                         Number(
-                            id.split(
-                                "_"
-                            )[1]
+                            id.split("_")[1]
                         );
 
                     return waterPlot(
@@ -1055,6 +1100,7 @@ module.exports = (client) => {
                         plotId
                     );
                 }
+
 
                 // ========================================================
                 // HARVEST PLOT
@@ -1068,9 +1114,7 @@ module.exports = (client) => {
 
                     const plotId =
                         Number(
-                            id.split(
-                                "_"
-                            )[1]
+                            id.split("_")[1]
                         );
 
                     return harvest(

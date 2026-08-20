@@ -1,4 +1,4 @@
-const {
+﻿const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -41,31 +41,38 @@ module.exports = (client) => {
         "messageCreate",
         async message => {
 
+            // --------------------------------------------------
+            // IGNORE BOT
+            // --------------------------------------------------
+
+            if (message.author.bot) {
+                return;
+            }
+
+            // --------------------------------------------------
+            // PREFIX
+            // --------------------------------------------------
+
+            const content =
+                message.content || "";
+
             if (
-                message.author.bot
+                !content
+                    .toLowerCase()
+                    .startsWith(PREFIX.toLowerCase())
             ) {
                 return;
             }
 
-            if (
-                !message.content
-                    .toLowerCase()
-                    .startsWith(
-                        PREFIX
-                    )
-            ) {
-                return;
-            }
+            // --------------------------------------------------
+            // ARGS
+            // --------------------------------------------------
 
             const args =
-                message.content
-                    .slice(
-                        PREFIX.length
-                    )
+                content
+                    .slice(PREFIX.length)
                     .trim()
-                    .split(
-                        /\s+/
-                    );
+                    .split(/\s+/);
 
             const command =
                 (
@@ -77,6 +84,10 @@ module.exports = (client) => {
                 return;
             }
 
+            // --------------------------------------------------
+            // INIT USER / FARM
+            // --------------------------------------------------
+
             getUser(
                 message.author
             );
@@ -85,32 +96,45 @@ module.exports = (client) => {
                 message.author.id
             );
 
+            // --------------------------------------------------
+            // COMMAND
+            // --------------------------------------------------
+
             try {
 
-                switch (
-                    command
-                ) {
+                switch (command) {
+
+                    // ==================================================
+                    // PING
+                    // ==================================================
 
                     case "ping": {
 
-                        const sent = await message.reply({
-                            content: "🏓 Pinging..."
-                        });
+                        const sent =
+                            await message.reply({
+                                content: "🏓 Pinging..."
+                            });
 
                         const latency =
                             sent.createdTimestamp -
                             message.createdTimestamp;
 
                         await sent.edit({
+
                             content:
                                 `🏓 Pong! Độ trễ tin nhắn: ${latency}ms | API: ${Math.round(client.ws.ping)}ms`
+
                         });
 
                         break;
                     }
 
+                    // ==================================================
+                    // HOME
+                    // ==================================================
+
                     case "start":
-                    case "home":
+                    case "home": {
 
                         await message.reply({
 
@@ -122,12 +146,18 @@ module.exports = (client) => {
 
                             components:
                                 mainButtons()
+
                         });
 
                         break;
+                    }
+
+                    // ==================================================
+                    // PROFILE
+                    // ==================================================
 
                     case "profile":
-                    case "p":
+                    case "p": {
 
                         await message.reply({
 
@@ -138,6 +168,7 @@ module.exports = (client) => {
                             ],
 
                             components: [
+
                                 new ActionRowBuilder()
                                     .addComponents(
 
@@ -182,14 +213,22 @@ module.exports = (client) => {
                                             .setStyle(
                                                 ButtonStyle.Secondary
                                             )
+
                                     )
+
                             ]
+
                         });
 
                         break;
+                    }
+
+                    // ==================================================
+                    // FARM
+                    // ==================================================
 
                     case "farm":
-                    case "f":
+                    case "f": {
 
                         await message.reply({
 
@@ -201,12 +240,18 @@ module.exports = (client) => {
 
                             components:
                                 farmButtons()
+
                         });
 
                         break;
+                    }
+
+                    // ==================================================
+                    // INVENTORY
+                    // ==================================================
 
                     case "inv":
-                    case "inventory":
+                    case "inventory": {
 
                         await message.reply({
 
@@ -218,11 +263,17 @@ module.exports = (client) => {
 
                             components:
                                 mainButtons()
+
                         });
 
                         break;
+                    }
 
-                    case "shop":
+                    // ==================================================
+                    // SHOP
+                    // ==================================================
+
+                    case "shop": {
 
                         await message.reply({
 
@@ -236,12 +287,18 @@ module.exports = (client) => {
                                 shopSelectMenu(
                                     message.author
                                 )
+
                         });
 
                         break;
+                    }
+
+                    // ==================================================
+                    // GENETICS
+                    // ==================================================
 
                     case "genetics":
-                    case "genes":
+                    case "genes": {
 
                         await message.reply({
 
@@ -253,11 +310,17 @@ module.exports = (client) => {
 
                             components:
                                 geneticsButtons()
+
                         });
 
                         break;
+                    }
 
-                    case "help":
+                    // ==================================================
+                    // HELP
+                    // ==================================================
+
+                    case "help": {
 
                         await message.reply({
 
@@ -269,14 +332,24 @@ module.exports = (client) => {
 
                             components:
                                 mainButtons()
+
                         });
 
                         break;
+                    }
+
+                    // ==================================================
+                    // PLANT
+                    // ==================================================
 
                     case "plant": {
 
                         const plantId =
                             args[0];
+
+                        // ------------------------------------------------
+                        // NO PLANT ID
+                        // ------------------------------------------------
 
                         if (!plantId) {
 
@@ -298,17 +371,27 @@ module.exports = (client) => {
                                             "Gieo Hạt",
 
                                         description:
-                                            "🌱 Chọn giống cây bạn muốn gieo."
+                                            "🌱 Chọn giống cây bạn muốn gieo.",
+
+                                        color:
+                                            COLORS.green
+
                                     })
+
                                 ],
 
                                 components:
                                     menu ||
                                     backButton()
+
                             });
 
                             break;
                         }
+
+                        // ------------------------------------------------
+                        // GET PLANT
+                        // ------------------------------------------------
 
                         const plant =
                             getPlant(
@@ -317,12 +400,19 @@ module.exports = (client) => {
 
                         if (!plant) {
 
-                            await message.reply(
-                                "❌ Không tìm thấy cây."
-                            );
+                            await message.reply({
+
+                                content:
+                                    "❌ Không tìm thấy cây."
+
+                            });
 
                             break;
                         }
+
+                        // ------------------------------------------------
+                        // PLOT SELECT
+                        // ------------------------------------------------
 
                         const rows =
                             plotSelect(
@@ -333,69 +423,87 @@ module.exports = (client) => {
                         await message.reply({
 
                             embeds: [
+
                                 plantDetailEmbed(
                                     message.author,
                                     plant
                                 )
+
                             ],
 
                             components:
                                 rows.length
                                     ? rows
                                     : backButton()
+
                         });
 
                         break;
                     }
-// ====================================================
-// ADMIN
-// ====================================================
 
-case "admin": {
+                    // ==================================================
+                    // ADMIN
+                    // ==================================================
 
-    if (!isAdmin(message.author)) {
+                    case "admin": {
 
-        await message.reply({
-            content:
-                "❌ Bạn không có quyền sử dụng lệnh Admin."
-        });
+                        if (
+                            !isAdmin(
+                                message.author
+                            )
+                        ) {
 
-        break;
-    }
+                            await message.reply({
 
-    await message.reply({
+                                content:
+                                    "❌ Bạn không có quyền sử dụng lệnh Admin."
 
-        embeds: [
+                            });
 
-            farmEmbed({
+                            break;
+                        }
 
-                user:
-                    message.author,
+                        await message.reply({
 
-                title:
-                    "⚙️ Admin Panel",
+                            embeds: [
 
-                description:
-                    [
-                        "🔐 **ADMIN MODE**",
-                        "",
-                        "> `nadmin shop` — đổi shop của người dùng",
-                        "> `nadmin mora @user 10000` — thêm Mora",
-                        "> `nadmin seed @user windwheel 10` — thêm hạt",
-                        "> `nadmin xp @user 100` — thêm EXP",
-                        "> `nadmin water @user 100` — thêm nước",
-                        "> `nadmin resetshop @user` — reset shop",
-                        "> `nadmin resetuser @user` — reset dữ liệu user"
-                    ].join("\n"),
+                                farmEmbed({
 
-                color:
-                    COLORS.red
-            })
-        ]
-    });
+                                    user:
+                                        message.author,
 
-    break;
-}
+                                    title:
+                                        "⚙️ Admin Panel",
+
+                                    description:
+                                        [
+                                            "🔐 **ADMIN MODE**",
+                                            "",
+                                            `> \`${PREFIX}nadmin shop\` — đổi shop của người dùng`,
+                                            `> \`${PREFIX}nadmin mora @user 10000\` — thêm Mora`,
+                                            `> \`${PREFIX}nadmin seed @user windwheel 10\` — thêm hạt`,
+                                            `> \`${PREFIX}nadmin xp @user 100\` — thêm EXP`,
+                                            `> \`${PREFIX}nadmin water @user 100\` — thêm nước`,
+                                            `> \`${PREFIX}nadmin resetshop @user\` — reset shop`,
+                                            `> \`${PREFIX}nadmin resetuser @user\` — reset dữ liệu user`
+                                        ].join("\n"),
+
+                                    color:
+                                        COLORS.red
+
+                                })
+
+                            ]
+
+                        });
+
+                        break;
+                    }
+
+                    // ==================================================
+                    // NPLANT
+                    // ==================================================
+
                     case "nplant": {
 
                         const plant =
@@ -405,9 +513,12 @@ case "admin": {
 
                         if (!plant) {
 
-                            await message.reply(
-                                "❌ Không tìm thấy cây."
-                            );
+                            await message.reply({
+
+                                content:
+                                    "❌ Không tìm thấy cây."
+
+                            });
 
                             break;
                         }
@@ -415,20 +526,27 @@ case "admin": {
                         await message.reply({
 
                             embeds: [
+
                                 plantDetailEmbed(
                                     message.author,
                                     plant
                                 )
+
                             ],
 
                             components:
                                 backButton()
+
                         });
 
                         break;
                     }
 
-                    default:
+                    // ==================================================
+                    // DEFAULT
+                    // ==================================================
+
+                    default: {
 
                         await message.reply({
 
@@ -444,11 +562,13 @@ case "admin": {
 
                                     description:
                                         `❌ Không tìm thấy \`${PREFIX}${command}\`.\n\n` +
-                                        `💡 Dùng **\`nhelp\`**.`,
+                                        `💡 Dùng **\`${PREFIX}help\`** để xem hướng dẫn.`,
 
                                     color:
                                         COLORS.red
+
                                 })
+
                             ],
 
                             components: [
@@ -483,25 +603,54 @@ case "admin": {
                                             .setStyle(
                                                 ButtonStyle.Secondary
                                             )
+
                                     )
+
                             ]
+
                         });
+
+                        break;
+                    }
                 }
 
             } catch (error) {
+
+                // --------------------------------------------------
+                // LOG ERROR
+                // --------------------------------------------------
 
                 console.error(
                     "Command error:",
                     error
                 );
 
+                // --------------------------------------------------
+                // ERROR RESPONSE
+                // --------------------------------------------------
+
                 if (
-                    !message.replied
+                    !message.replied &&
+                    !message.deletable === false
                 ) {
 
-                    await message.reply(
-                        "❌ Có lỗi xảy ra. Hãy thử lại."
-                    );
+                    try {
+
+                        await message.reply({
+
+                            content:
+                                "❌ Có lỗi xảy ra. Hãy thử lại."
+
+                        });
+
+                    } catch (replyError) {
+
+                        console.error(
+                            "Error sending error message:",
+                            replyError
+                        );
+
+                    }
                 }
             }
         }

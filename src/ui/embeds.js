@@ -1,13 +1,33 @@
-const { EmbedBuilder } = require("discord.js");
+﻿const { EmbedBuilder } = require("discord.js");
 
 const plantDatabase =
-    require("../../database/plants");
+    require("../database/plants");
 
-const { COLORS, SHOP_REFRESH_COST, BREED_COST } = require("../config");
-const { unixSeconds, formatTime } = require("../utils/time");
-const { getUser, xpRequired } = require("../game/user");
-const { getInventory } = require("../game/inventory");
-const { getPlots, isReady } = require("../game/plots");
+const {
+    COLORS,
+    SHOP_REFRESH_COST,
+    BREED_COST
+} = require("../config");
+
+const {
+    unixSeconds,
+    formatTime
+} = require("../utils/time");
+
+const {
+    getUser,
+    xpRequired
+} = require("../game/user");
+
+const {
+    getInventory
+} = require("../game/inventory");
+
+const {
+    getPlots,
+    isReady
+} = require("../game/plots");
+
 const {
     isHybridPlant,
     getPlant,
@@ -18,6 +38,7 @@ const {
     plantSellPrice,
     getSeedPrice
 } = require("../game/plants");
+
 
 // ============================================================
 // FARM EMBED
@@ -51,6 +72,7 @@ function farmEmbed({
         .setTimestamp();
 }
 
+
 // ============================================================
 // HOME
 // ============================================================
@@ -63,27 +85,46 @@ function homeEmbed(
         getUser(user);
 
     const text = [
+
         `\`${user.username}\` — **Lv.${data.level}**`,
+
         "",
-        "> “Mỗi hạt giống đều mang trong mình",
-        "> một giấc mơ nhỏ.”",
+
+        '> “Mỗi hạt giống đều mang trong mình',
+        '> một giấc mơ nhỏ.”',
         "> — Nahida",
+
         "",
+
         `💰 ${data.mora.toLocaleString()} Mora`,
-        `💧 ${data.water}/100 Nước`,
+
+        `💧 ${data.water}/200 Nước`,
+
         "",
+
         "🌱 Chăm sóc khu vườn của bạn,",
+
         "lai tạo giống cây mới và khám phá",
+
         "những đột biến hiếm."
+
     ].join("\n");
 
     return farmEmbed({
+
         user,
-        title: "Khu Vườn",
-        description: text,
-        color: COLORS.green
+
+        title:
+            "Khu Vườn",
+
+        description:
+            text,
+
+        color:
+            COLORS.green
     });
 }
+
 
 // ============================================================
 // PROFILE
@@ -97,27 +138,48 @@ function profileEmbed(
         getUser(user);
 
     const text = [
+
         `\`${user.username}\``,
+
         "",
+
         `⭐ Level: **${data.level}**`,
+
         `✨ EXP: **${data.xp}/${xpRequired(data.level)}**`,
+
         `🌱 Farm Level: **${data.farm_level}**`,
+
         `🌾 Farm EXP: **${data.farm_xp}/${data.farm_level * 100}**`,
+
         "",
+
         `💰 Mora: **${data.mora.toLocaleString()}**`,
-        `💧 Nước: **${data.water}/100**`,
+
+        `💧 Nước: **${data.water}/200**`,
+
         "",
+
         `🌾 Đã thu hoạch: **${data.harvest_count}**`,
+
         `🐛 Đã bắt sâu: **${data.bug_count}**`
+
     ].join("\n");
 
     return farmEmbed({
+
         user,
-        title: "Hồ Sơ",
-        description: text,
-        color: COLORS.purple
+
+        title:
+            "Hồ Sơ",
+
+        description:
+            text,
+
+        color:
+            COLORS.purple
     });
 }
+
 
 // ============================================================
 // INVENTORY
@@ -133,13 +195,20 @@ function inventoryEmbed(
         );
 
     const lines = [
+
         `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+
         "",
+
         "🎒 **TÚI ĐỒ**",
+
         ""
+
     ];
 
-    if (!items.length) {
+    if (
+        !items.length
+    ) {
 
         lines.push(
             "> 🎒 Túi đồ đang trống."
@@ -167,14 +236,20 @@ function inventoryEmbed(
     }
 
     return farmEmbed({
+
         user,
-        title: "Túi Đồ",
+
+        title:
+            "Túi Đồ",
+
         description:
             lines.join("\n"),
+
         color:
             COLORS.gray
     });
 }
+
 
 // ============================================================
 // PLANT DETAIL
@@ -187,24 +262,35 @@ function plantDetailEmbed(
 
     const genes =
         isHybridPlant(plant.id)
+
             ? {
+
                 growth:
                     plant.growth_gene,
+
                 yield:
                     plant.yield_gene,
+
                 water:
                     plant.water_gene,
+
                 rarity:
                     plant.rarity_gene,
+
                 mutation:
                     plant.mutation_gene
+
             }
+
             : (
+
                 typeof plantDatabase.getGenes ===
                 "function"
+
                     ? plantDatabase.getGenes(
                         plant.id
                     )
+
                     : null
             );
 
@@ -301,15 +387,20 @@ function plantDetailEmbed(
     }
 
     return farmEmbed({
+
         user,
+
         title:
             `${plantEmoji(plant)} ${plantName(plant)}`,
+
         description:
             lines.join("\n"),
+
         color:
             COLORS.purple
     });
 }
+
 
 // ============================================================
 // FARM EMBED VIEW
@@ -325,15 +416,24 @@ function farmEmbedView(
         );
 
     const lines = [
+
         `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+
         "",
+
         "🌱 **NÔNG TRẠI**",
+
         ""
+
     ];
 
     for (
         const plot of plots
     ) {
+
+        // ----------------------------------------------------
+        // EMPTY PLOT
+        // ----------------------------------------------------
 
         if (
             !plot.plant_id
@@ -351,6 +451,10 @@ function farmEmbedView(
                 plot.plant_id
             );
 
+        // ----------------------------------------------------
+        // INVALID PLANT
+        // ----------------------------------------------------
+
         if (!plant) {
 
             lines.push(
@@ -360,12 +464,20 @@ function farmEmbedView(
             continue;
         }
 
+        // ----------------------------------------------------
+        // READY
+        // ----------------------------------------------------
+
         if (
             isReady(plot)
         ) {
 
             lines.push(
-                `🌾 **Ô ${plot.plot_id}** — ${plantEmoji(plant)} **${plantName(plant)}** — **SẴN SÀNG THU HOẠCH!**`
+
+                `🌾 **Ô ${plot.plot_id}** — ` +
+                `${plantEmoji(plant)} **${plantName(plant)}** — ` +
+                "**SẴN SÀNG THU HOẠCH!**"
+
             );
 
         } else {
@@ -376,24 +488,44 @@ function farmEmbedView(
                 );
 
             lines.push(
-                `🌱 **Ô ${plot.plot_id}** — ${plantEmoji(plant)} **${plantName(plant)}** — <t:${finish}:R>`
+
+                `🌱 **Ô ${plot.plot_id}** — ` +
+                `${plantEmoji(plant)} **${plantName(plant)}** — ` +
+                `<t:${finish}:R>`
+
             );
         }
 
+        // ----------------------------------------------------
+        // WATER STATUS
+        // ----------------------------------------------------
+
         lines.push(
-            `> 💧 ${plot.watered ? "Đã tưới" : "Chưa tưới"}`
+
+            `> 💧 ${
+                plot.watered
+                    ? "Đã tưới"
+                    : "Chưa tưới"
+            }`
+
         );
     }
 
     return farmEmbed({
+
         user,
-        title: "Nông Trại",
+
+        title:
+            "Nông Trại",
+
         description:
             lines.join("\n"),
+
         color:
             COLORS.green
     });
 }
+
 
 // ============================================================
 // HELP
@@ -412,8 +544,11 @@ function helpEmbed(
         "🌱 **CƠ BẢN**",
 
         "> `nstart` — mở trang chủ",
+
         "> `nprofile` — xem hồ sơ",
+
         "> `nfarm` — mở nông trại",
+
         "> `ninv` — xem túi đồ",
 
         "",
@@ -421,18 +556,35 @@ function helpEmbed(
         "🌾 **NÔNG TRẠI**",
 
         "> Gieo hạt bằng nút 🌱",
+
         "> Tưới nước bằng nút 💧",
+
         "> Thu hoạch bằng nút 🌾",
+
         "> Bắt sâu bằng nút 🐛",
+
+        "",
+
+        "💧 **NƯỚC**",
+
+        "> Sức chứa tối đa: **200 nước**.",
+
+        "> Nước sẽ hồi đầy sau **30 phút**.",
+
+        "> Không thể vượt quá **200 nước**.",
 
         "",
 
         "🛒 **CỬA HÀNG**",
 
         "> Shop có **5 loại hạt** riêng cho từng người.",
+
         "> Shop tự đổi sau **30 phút**.",
+
         "> Có **3 lần đổi shop miễn phí/ngày**.",
+
         `> Sau 3 lần: **${SHOP_REFRESH_COST} Mora/lần**.`,
+
         "> Chọn hạt → nhập số lượng muốn mua.",
 
         "",
@@ -440,33 +592,55 @@ function helpEmbed(
         "🧬 **LAI TẠO**",
 
         `> Chi phí: **${BREED_COST} Mora/lần**.`,
+
         "> Chọn cây bố → chọn cây mẹ.",
+
         "> Mỗi cây bố/mẹ tiêu hao 1 cây.",
+
         "> Gene được kế thừa từ cả hai cây.",
+
         "> Có cơ hội tạo Mutation hiếm.",
 
         "",
 
         "💡 Thời gian cây dùng đồng hồ Discord."
+
     ].join("\n");
 
     return farmEmbed({
+
         user,
+
         title:
             "Hướng Dẫn",
+
         description:
             text,
+
         color:
             COLORS.water
     });
 }
 
+
+// ============================================================
+// EXPORT
+// ============================================================
+
 module.exports = {
+
     farmEmbed,
+
     homeEmbed,
+
     profileEmbed,
+
     inventoryEmbed,
+
     plantDetailEmbed,
+
     farmEmbedView,
+
     helpEmbed
+
 };
