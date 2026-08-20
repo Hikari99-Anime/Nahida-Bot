@@ -1,14 +1,14 @@
 ﻿// src/game/plants.js
-// ========================================
+// ============================================================
 // 🌱 NAHIDA FARM - PLANTS DATABASE
-// ========================================
+// ============================================================
 
 const fs = require("fs");
 const path = require("path");
 
-// ========================================
+// ============================================================
 // DATABASE PATH
-// ========================================
+// ============================================================
 
 const PLANTS_FILE = path.join(
     process.cwd(),
@@ -22,26 +22,33 @@ console.log("[PLANTS] CWD:", process.cwd());
 console.log("[PLANTS] File:", PLANTS_FILE);
 console.log("========================================");
 
-// ========================================
+// ============================================================
 // LOAD
-// ========================================
+// ============================================================
 
 let plants = [];
 
 try {
+
     if (!fs.existsSync(PLANTS_FILE)) {
+
         console.error(
             `[PLANTS] ❌ Không tìm thấy file: ${PLANTS_FILE}`
         );
-    } else {
-        const raw = fs.readFileSync(
-            PLANTS_FILE,
-            "utf8"
-        );
 
-        const data = JSON.parse(raw);
+    } else {
+
+        const raw =
+            fs.readFileSync(
+                PLANTS_FILE,
+                "utf8"
+            );
+
+        const data =
+            JSON.parse(raw);
 
         if (!Array.isArray(data)) {
+
             throw new Error(
                 "plants.json phải chứa một Array"
             );
@@ -53,7 +60,9 @@ try {
             `[PLANTS] ✅ Loaded ${plants.length} plants`
         );
     }
+
 } catch (error) {
+
     console.error(
         "[PLANTS] ❌ Load error:",
         error
@@ -62,305 +71,401 @@ try {
     plants = [];
 }
 
-// ========================================
+// ============================================================
 // NORMALIZE
-// ========================================
+// ============================================================
 
-plants = plants
-    .filter(
-        (plant) =>
-            plant &&
-            typeof plant === "object" &&
-            plant.id
-    )
-    .map((plant) => {
-        // ----------------------------------------
-        // BASIC PRICE
-        // ----------------------------------------
+plants =
+    plants
+        .filter(
+            (plant) =>
+                plant &&
+                typeof plant === "object" &&
+                plant.id
+        )
+        .map(
+            (plant) => {
 
-        const sellPrice =
-            Number(plant.sellPrice) || 0;
+                // ====================================================
+                // BASIC PRICE
+                // ====================================================
 
-        const fallbackSeedPrice =
-            Math.max(
-                1,
-                Math.ceil(sellPrice * 2)
-            );
-
-        const rawSeedPrice =
-            plant.seedPrice !== undefined
-                ? Number(plant.seedPrice)
-                : fallbackSeedPrice;
-
-        const seedPrice =
-            Number.isFinite(rawSeedPrice)
-                ? Math.max(
-                    1,
-                    rawSeedPrice
-                )
-                : fallbackSeedPrice;
-
-        // ----------------------------------------
-        // YIELD
-        // ----------------------------------------
-
-        const yieldMin =
-            Math.max(
-                1,
-                Number(
-                    plant.yield?.min
-                ) || 1
-            );
-
-        const yieldMax =
-            Math.max(
-                yieldMin,
-                Number(
-                    plant.yield?.max
-                ) || yieldMin
-            );
-
-        // ----------------------------------------
-        // RETURN NORMALIZED PLANT
-        // ----------------------------------------
-
-        return {
-            ...plant,
-
-            // ------------------------------------
-            // ID
-            // ------------------------------------
-
-            id: String(plant.id),
-
-            // ------------------------------------
-            // NAME
-            // ------------------------------------
-
-            name:
-                plant.name ||
-                String(plant.id),
-
-            nameVi:
-                plant.nameVi ||
-                plant.name ||
-                String(plant.id),
-
-            // ------------------------------------
-            // DISPLAY
-            // ------------------------------------
-
-            emoji:
-                plant.emoji ||
-                "🌱",
-
-            color:
-                plant.color ||
-                "green",
-
-            description:
-                plant.description ||
-                "Một loại cây trong Nahida Farm.",
-
-            // ------------------------------------
-            // REGION
-            // ------------------------------------
-
-            region:
-                plant.region ||
-                "Unknown",
-
-            // ------------------------------------
-            // RARITY
-            // ------------------------------------
-
-            rarity:
-                Math.max(
-                    1,
+                const sellPrice =
                     Number(
-                        plant.rarity
-                    ) || 1
-                ),
+                        plant.sellPrice
+                    ) || 0;
 
-            // ------------------------------------
-            // GROWTH
-            // ------------------------------------
+                // ----------------------------------------
+                // Seed price fallback
+                // ----------------------------------------
 
-            growthTime:
-                Math.max(
-                    0,
-                    Number(
-                        plant.growthTime
-                    ) || 300
-                ),
+                const fallbackSeedPrice =
+                    Math.max(
+                        1,
+                        Math.ceil(
+                            sellPrice * 2
+                        )
+                    );
 
-            // ------------------------------------
-            // WATER
-            // ------------------------------------
+                const rawSeedPrice =
+                    plant.seedPrice !== undefined
+                        ? Number(
+                            plant.seedPrice
+                        )
+                        : fallbackSeedPrice;
 
-            waterCost:
-                Math.max(
-                    0,
-                    Number(
-                        plant.waterCost
-                    ) || 0
-                ),
+                const seedPrice =
+                    Number.isFinite(
+                        rawSeedPrice
+                    )
+                        ? Math.max(
+                            1,
+                            rawSeedPrice
+                        )
+                        : fallbackSeedPrice;
 
-            // ------------------------------------
-            // YIELD
-            // ------------------------------------
+                // ====================================================
+                // 🌱 YIELD BALANCE
+                // ====================================================
+                //
+                // QUAN TRỌNG:
+                //
+                // Dù plants.json có:
+                //
+                // yield: {
+                //     min: 20,
+                //     max: 50
+                // }
+                //
+                // hệ thống game vẫn chỉ cho:
+                //
+                // 1 -> 3
+                //
+                // Điều này tránh:
+                //
+                // 1 hạt -> 50 cây
+                // 50 cây -> quá nhiều Mora
+                //
+                // ====================================================
 
-            yield: {
-                min: yieldMin,
-                max: yieldMax,
-            },
+                const yieldMin = 1;
+                const yieldMax = 3;
 
-            // ------------------------------------
-            // PRICE
-            // ------------------------------------
+                // ====================================================
+                // GENES
+                // ====================================================
 
-            sellPrice,
+                const genes = {
 
-            seedPrice,
+                    growth:
+                        Number(
+                            plant.genes?.growth
+                        ) || 0,
 
-            // ------------------------------------
-            // XP
-            // ------------------------------------
+                    yield:
+                        Number(
+                            plant.genes?.yield
+                        ) || 0,
 
-            farmXP:
-                Math.max(
-                    0,
-                    Number(
-                        plant.farmXP
-                    ) || 0
-                ),
+                    water:
+                        Number(
+                            plant.genes?.water
+                        ) || 0,
 
-            profileXP:
-                Math.max(
-                    0,
-                    Number(
-                        plant.profileXP
-                    ) || 0
-                ),
+                    rarity:
+                        Number(
+                            plant.genes?.rarity
+                        ) || 0,
 
-            // ------------------------------------
-            // GENES
-            // ------------------------------------
+                    mutation:
+                        Number(
+                            plant.genes?.mutation
+                        ) || 0,
 
-            genes: {
-                growth:
-                    Number(
-                        plant.genes?.growth
-                    ) || 0,
+                };
 
-                yield:
-                    Number(
-                        plant.genes?.yield
-                    ) || 0,
+                // ====================================================
+                // MUTATIONS
+                // ====================================================
 
-                water:
-                    Number(
-                        plant.genes?.water
-                    ) || 0,
+                const mutations =
+                    Array.isArray(
+                        plant.mutations
+                    )
+                        ? plant.mutations
+                        : [];
 
-                rarity:
-                    Number(
-                        plant.genes?.rarity
-                    ) || 0,
+                // ====================================================
+                // NORMALIZED PLANT
+                // ====================================================
 
-                mutation:
-                    Number(
-                        plant.genes?.mutation
-                    ) || 0,
-            },
+                return {
 
-            // ------------------------------------
-            // MUTATIONS
-            // ------------------------------------
+                    ...plant,
 
-            mutations:
-                Array.isArray(
-                    plant.mutations
-                )
-                    ? plant.mutations
-                    : [],
+                    // ==================================================
+                    // ID
+                    // ==================================================
 
-            // ------------------------------------
-            // UNLOCK
-            // ------------------------------------
+                    id:
+                        String(
+                            plant.id
+                        ),
 
-            unlockLevel:
-                Math.max(
-                    1,
-                    Number(
-                        plant.unlockLevel
-                    ) || 1
-                ),
-        };
-    });
+                    // ==================================================
+                    // NAME
+                    // ==================================================
 
-// ========================================
+                    name:
+                        plant.name ||
+                        String(
+                            plant.id
+                        ),
+
+                    nameVi:
+                        plant.nameVi ||
+                        plant.name ||
+                        String(
+                            plant.id
+                        ),
+
+                    // ==================================================
+                    // DISPLAY
+                    // ==================================================
+
+                    emoji:
+                        plant.emoji ||
+                        "🌱",
+
+                    color:
+                        plant.color ||
+                        "green",
+
+                    description:
+                        plant.description ||
+                        "Một loại cây trong Nahida Farm.",
+
+                    // ==================================================
+                    // REGION
+                    // ==================================================
+
+                    region:
+                        plant.region ||
+                        "Unknown",
+
+                    // ==================================================
+                    // RARITY
+                    // ==================================================
+
+                    rarity:
+                        Math.max(
+                            1,
+                            Math.min(
+                                5,
+                                Number(
+                                    plant.rarity
+                                ) || 1
+                            )
+                        ),
+
+                    // ==================================================
+                    // GROWTH TIME
+                    // ==================================================
+
+                    growthTime:
+                        Math.max(
+                            0,
+                            Number(
+                                plant.growthTime
+                            ) || 300
+                        ),
+
+                    // ==================================================
+                    // WATER
+                    // ==================================================
+
+                    waterCost:
+                        Math.max(
+                            0,
+                            Number(
+                                plant.waterCost
+                            ) || 0
+                        ),
+
+                    // ==================================================
+                    // 🌱 YIELD
+                    // ==================================================
+
+                    yield: {
+
+                        min:
+                            yieldMin,
+
+                        max:
+                            yieldMax,
+
+                    },
+
+                    // ==================================================
+                    // PRICE
+                    // ==================================================
+
+                    sellPrice:
+                        Math.max(
+                            0,
+                            sellPrice
+                        ),
+
+                    seedPrice:
+                        seedPrice,
+
+                    // ==================================================
+                    // XP
+                    // ==================================================
+
+                    farmXP:
+                        Math.max(
+                            0,
+                            Number(
+                                plant.farmXP
+                            ) || 0
+                        ),
+
+                    profileXP:
+                        Math.max(
+                            0,
+                            Number(
+                                plant.profileXP
+                            ) || 0
+                        ),
+
+                    // ==================================================
+                    // GENES
+                    // ==================================================
+
+                    genes:
+
+                        genes,
+
+                    // ==================================================
+                    // MUTATIONS
+                    // ==================================================
+
+                    mutations:
+
+                        mutations,
+
+                    // ==================================================
+                    // UNLOCK
+                    // ==================================================
+
+                    unlockLevel:
+                        Math.max(
+                            1,
+                            Number(
+                                plant.unlockLevel
+                            ) || 1
+                        ),
+
+                };
+            }
+        );
+
+// ============================================================
 // MAP
-// ========================================
+// ============================================================
 
-const plantsById = new Map();
+const plantsById =
+    new Map();
 
-for (const plant of plants) {
+for (
+    const plant of plants
+) {
+
     plantsById.set(
         plant.id,
         plant
     );
 }
 
-// ========================================
+// ============================================================
 // DATABASE GETTERS
-// ========================================
+// ============================================================
 
 function getAllPlants() {
+
     return plants;
+
 }
 
-// Alias
+// ============================================================
+// ALIAS
+// ============================================================
+
 function getPlants() {
+
     return getAllPlants();
+
 }
 
-// Alias
 function getPlantList() {
+
     return getAllPlants();
+
 }
 
-// ========================================
+// ============================================================
 // GET ONE PLANT
-// ========================================
+// ============================================================
 
-function getPlant(id) {
-    if (!id) return null;
+function getPlant(
+    id
+) {
+
+    if (!id) {
+
+        return null;
+
+    }
 
     return (
         plantsById.get(
             String(id)
         ) || null
     );
+
 }
 
-function getPlantById(id) {
-    return getPlant(id);
-}
+function getPlantById(
+    id
+) {
 
-function hasPlant(id) {
-    return Boolean(
-        getPlant(id)
+    return getPlant(
+        id
     );
+
 }
 
-// ========================================
+function hasPlant(
+    id
+) {
+
+    return Boolean(
+        getPlant(
+            id
+        )
+    );
+
+}
+
+// ============================================================
 // AVAILABLE / UNLOCKED
-// ========================================
+// ============================================================
 
 function getAvailablePlants(
     level = 1
 ) {
+
     level =
         Number(level) || 1;
 
@@ -368,17 +473,23 @@ function getAvailablePlants(
         (plant) =>
             plant.unlockLevel <= level
     );
+
 }
 
 function getUnlockedPlants(
     level = 1
 ) {
-    return getAvailablePlants(level);
+
+    return getAvailablePlants(
+        level
+    );
+
 }
 
 function getLockedPlants(
     level = 1
 ) {
+
     level =
         Number(level) || 1;
 
@@ -386,65 +497,88 @@ function getLockedPlants(
         (plant) =>
             plant.unlockLevel > level
     );
+
 }
 
-// ========================================
+// ============================================================
 // REGION
-// ========================================
+// ============================================================
 
 function getPlantsByRegion(
     region
 ) {
-    if (!region) return [];
+
+    if (!region) {
+
+        return [];
+
+    }
 
     const target =
-        String(region)
+        String(
+            region
+        )
             .toLowerCase()
             .trim();
 
     return plants.filter(
         (plant) =>
-            String(plant.region)
+            String(
+                plant.region
+            )
                 .toLowerCase()
-                .trim() === target
+                .trim() ===
+            target
     );
+
 }
 
-// ========================================
+// ============================================================
 // RARITY
-// ========================================
+// ============================================================
 
 function getPlantsByRarity(
     rarity
 ) {
+
     rarity =
-        Number(rarity);
+        Number(
+            rarity
+        );
 
     return plants.filter(
         (plant) =>
-            plant.rarity === rarity
+            plant.rarity ===
+            rarity
     );
+
 }
 
-// ========================================
+// ============================================================
 // SHOP
-// ========================================
+// ============================================================
 
 function getShopPlants(
     level = 1,
     options = {}
 ) {
+
     level =
         Number(level) || 1;
 
     let result =
-        getAvailablePlants(level);
+        getAvailablePlants(
+            level
+        );
 
-    // ----------------------------------------
+    // ========================================================
     // REGION FILTER
-    // ----------------------------------------
+    // ========================================================
 
-    if (options.region) {
+    if (
+        options.region
+    ) {
+
         const targetRegion =
             String(
                 options.region
@@ -464,14 +598,15 @@ function getShopPlants(
             );
     }
 
-    // ----------------------------------------
+    // ========================================================
     // RARITY FILTER
-    // ----------------------------------------
+    // ========================================================
 
     if (
         options.rarity !== undefined &&
         options.rarity !== null
     ) {
+
         const targetRarity =
             Number(
                 options.rarity
@@ -485,335 +620,481 @@ function getShopPlants(
             );
     }
 
-    // ----------------------------------------
+    // ========================================================
     // LIMIT
-    // ----------------------------------------
+    // ========================================================
 
     if (
         options.limit !== undefined &&
         options.limit !== null
     ) {
+
         const limit =
-            Number(options.limit);
+            Number(
+                options.limit
+            );
 
         if (
-            Number.isFinite(limit) &&
+            Number.isFinite(
+                limit
+            ) &&
             limit > 0
         ) {
+
             result =
                 result.slice(
                     0,
-                    Math.floor(limit)
+                    Math.floor(
+                        limit
+                    )
                 );
+
         }
     }
 
     return result;
+
 }
 
-// ========================================
-// PLANT HELPERS
-// ========================================
+// ============================================================
+// PLANT RESOLVER
+// ============================================================
 
 function resolvePlant(
     plant
 ) {
-    if (!plant) return null;
+
+    if (!plant) {
+
+        return null;
+
+    }
 
     if (
         typeof plant ===
         "string"
     ) {
-        return getPlant(plant);
+
+        return getPlant(
+            plant
+        );
+
     }
 
     if (
         typeof plant ===
         "object"
     ) {
+
         return plant;
+
     }
 
     return null;
+
 }
 
-// ========================================
+// ============================================================
 // EMOJI
-// ========================================
+// ============================================================
 
 function plantEmoji(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return (
         plant?.emoji ||
         "🌱"
     );
+
 }
 
-// ========================================
+// ============================================================
 // NAME
-// ========================================
+// ============================================================
 
 function plantName(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return (
         plant?.name ||
         "Unknown Plant"
     );
+
 }
 
 function plantNameVi(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return (
         plant?.nameVi ||
         plant?.name ||
         "Không rõ"
     );
+
 }
 
-// ========================================
+// ============================================================
 // GROWTH
-// ========================================
+// ============================================================
 
 function plantGrowth(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.growthTime
     ) || 0;
+
 }
 
-// ========================================
+// ============================================================
 // WATER
-// ========================================
+// ============================================================
 
 function plantWater(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.waterCost
     ) || 0;
+
 }
 
-// ========================================
+// ============================================================
 // SELL PRICE
-// ========================================
+// ============================================================
 
 function plantSellPrice(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.sellPrice
     ) || 0;
+
 }
 
-// ========================================
+// ============================================================
 // SEED PRICE
-// ========================================
+// ============================================================
 
 function plantSeedPrice(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.seedPrice
     ) || 0;
+
 }
 
-// Alias
 function seedPrice(
     plant
 ) {
-    return plantSeedPrice(plant);
+
+    return plantSeedPrice(
+        plant
+    );
+
 }
 
-// ========================================
+// ============================================================
 // RARITY
-// ========================================
+// ============================================================
 
 function plantRarity(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.rarity
     ) || 1;
+
 }
 
-// ========================================
+// ============================================================
 // UNLOCK LEVEL
-// ========================================
+// ============================================================
 
 function plantUnlockLevel(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.unlockLevel
     ) || 1;
+
 }
 
-// ========================================
-// YIELD
-// ========================================
+// ============================================================
+// 🌱 YIELD
+// ============================================================
+//
+// Đây là điểm cân bằng quan trọng.
+//
+// Mọi cây thường:
+//
+// 1 hạt giống
+//      ↓
+//  trồng
+//      ↓
+//  thu hoạch
+//      ↓
+//  1–3 sản phẩm
+//
+// Không có cây thường nào vượt quá 3.
+//
+// ============================================================
 
 function plantYield(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
-
-    const min =
-        Math.max(
-            1,
-            Number(
-                plant?.yield?.min
-            ) || 1
+        resolvePlant(
+            plant
         );
 
-    const max =
-        Math.max(
-            min,
-            Number(
-                plant?.yield?.max
-            ) || min
-        );
+    if (!plant) {
+
+        return {
+
+            min: 1,
+
+            max: 1,
+
+        };
+
+    }
 
     return {
-        min,
-        max,
+
+        min: 1,
+
+        max: 3,
+
     };
+
 }
 
-// ========================================
+// ============================================================
+// RANDOM YIELD
+// ============================================================
+//
+// Dùng function này nếu farm cần lấy trực tiếp
+// số lượng sản phẩm thu hoạch.
+//
+// Kết quả:
+// 1 / 2 / 3
+//
+// ============================================================
+
+function randomPlantYield(
+    plant
+) {
+
+    const range =
+        plantYield(
+            plant
+        );
+
+    return (
+        Math.floor(
+            Math.random() *
+            (
+                range.max -
+                range.min +
+                1
+            )
+        ) +
+        range.min
+    );
+
+}
+
+// ============================================================
 // MUTATIONS
-// ========================================
+// ============================================================
 
 function plantMutations(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Array.isArray(
         plant?.mutations
     )
         ? plant.mutations
         : [];
+
 }
 
-// ========================================
+// ============================================================
 // REGION
-// ========================================
+// ============================================================
 
 function plantRegion(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return (
         plant?.region ||
         "Unknown"
     );
+
 }
 
-// ========================================
+// ============================================================
 // COLOR
-// ========================================
+// ============================================================
 
 function plantColor(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return (
         plant?.color ||
         "green"
     );
+
 }
 
-// ========================================
+// ============================================================
 // XP
-// ========================================
+// ============================================================
 
 function plantFarmXP(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.farmXP
     ) || 0;
+
 }
 
 function plantProfileXP(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return Number(
         plant?.profileXP
     ) || 0;
+
 }
 
-// ========================================
+// ============================================================
 // DESCRIPTION
-// ========================================
+// ============================================================
 
 function plantDescription(
     plant
 ) {
+
     plant =
-        resolvePlant(plant);
+        resolvePlant(
+            plant
+        );
 
     return (
         plant?.description ||
         ""
     );
+
 }
 
-// ========================================
+// ============================================================
 // TIME FORMAT
-// ========================================
+// ============================================================
 
 function formatGrowthTime(
     seconds
 ) {
-    seconds =
-        Number(seconds) || 0;
 
-    if (seconds <= 0) {
+    seconds =
+        Number(
+            seconds
+        ) || 0;
+
+    if (
+        seconds <= 0
+    ) {
+
         return "Ngay lập tức";
+
     }
 
     const hours =
@@ -823,7 +1104,9 @@ function formatGrowthTime(
 
     const minutes =
         Math.floor(
-            (seconds % 3600) / 60
+            (
+                seconds % 3600
+            ) / 60
         );
 
     const secs =
@@ -833,92 +1116,135 @@ function formatGrowthTime(
 
     const parts = [];
 
-    if (hours > 0) {
+    if (
+        hours > 0
+    ) {
+
         parts.push(
             `${hours}h`
         );
+
     }
 
-    if (minutes > 0) {
+    if (
+        minutes > 0
+    ) {
+
         parts.push(
             `${minutes}m`
         );
+
     }
 
     if (
         secs > 0 &&
         hours === 0
     ) {
+
         parts.push(
             `${secs}s`
         );
+
     }
 
     return (
         parts.join(" ") ||
         "0s"
     );
+
 }
 
-// ========================================
+// ============================================================
 // RARITY DISPLAY
-// ========================================
+// ============================================================
 
 function rarityStars(
     rarity
 ) {
+
     rarity =
         Math.max(
             1,
             Math.min(
                 5,
-                Number(rarity) || 1
+                Number(
+                    rarity
+                ) || 1
             )
         );
 
     return "⭐".repeat(
-        rarity
+        Math.floor(
+            rarity
+        )
     );
+
 }
 
 function rarityName(
     rarity
 ) {
+
     rarity =
-        Number(rarity) || 1;
+        Number(
+            rarity
+        ) || 1;
 
     const names = {
+
         1: "Common",
+
         2: "Uncommon",
+
         3: "Rare",
+
         4: "Epic",
+
         5: "Legendary",
+
     };
 
     return (
-        names[rarity] ||
+        names[
+            Math.floor(
+                rarity
+            )
+        ] ||
         "Unknown"
     );
+
 }
 
-// ========================================
+// ============================================================
 // SEARCH
-// ========================================
+// ============================================================
 
 function searchPlants(
     query
 ) {
-    if (!query) return [];
+
+    if (!query) {
+
+        return [];
+
+    }
 
     const q =
-        String(query)
+        String(
+            query
+        )
             .toLowerCase()
             .trim();
 
-    if (!q) return [];
+    if (!q) {
+
+        return [];
+
+    }
 
     return plants.filter(
         (plant) =>
+
             String(
                 plant.id
             )
@@ -936,21 +1262,28 @@ function searchPlants(
             )
                 .toLowerCase()
                 .includes(q)
+
     );
+
 }
 
-// ========================================
+// ============================================================
 // RANDOM
-// ========================================
+// ============================================================
 
 function randomPlant(
     list = plants
 ) {
+
     if (
-        !Array.isArray(list) ||
+        !Array.isArray(
+            list
+        ) ||
         list.length === 0
     ) {
+
         return null;
+
     }
 
     return list[
@@ -959,139 +1292,191 @@ function randomPlant(
             list.length
         )
     ];
+
 }
 
 function randomAvailablePlant(
     level = 1
 ) {
+
     return randomPlant(
-        getAvailablePlants(level)
+        getAvailablePlants(
+            level
+        )
     );
+
 }
 
-// ========================================
+// ============================================================
 // DEBUG
-// ========================================
+// ============================================================
 
 console.log(
     "[PLANTS] Kiểm tra giá hạt giống:"
 );
 
 plants
-    .slice(0, 10)
-    .forEach((plant) => {
-        console.log(
-            `  ${plant.emoji} ${plant.id} -> ${plant.seedPrice} Mora`
-        );
-    });
+    .slice(
+        0,
+        10
+    )
+    .forEach(
+        (plant) => {
+
+            console.log(
+
+                `  ${plant.emoji} ` +
+                `${plant.id} -> ` +
+                `${plant.seedPrice} Mora ` +
+                `| Yield ${plant.yield.min}-${plant.yield.max}`
+
+            );
+
+        }
+    );
 
 console.log(
     `[PLANTS] Total valid plants: ${plants.length}`
 );
 
 console.log(
+    "[PLANTS] 🌱 Global harvest yield: 1-3"
+);
+
+console.log(
     "========================================"
 );
 
-// ========================================
+// ============================================================
 // EXPORT
-// ========================================
+// ============================================================
 
 module.exports = {
-    // ------------------------------------
-    // Database
-    // ------------------------------------
+
+    // ========================================================
+    // DATABASE
+    // ========================================================
 
     plants,
+
     plantsById,
 
-    // ------------------------------------
-    // Main getters
-    // ------------------------------------
+    // ========================================================
+    // MAIN GETTERS
+    // ========================================================
 
     getAllPlants,
+
     getPlants,
+
     getPlantList,
 
-    // ------------------------------------
-    // Single plant
-    // ------------------------------------
+    // ========================================================
+    // SINGLE PLANT
+    // ========================================================
 
     getPlant,
+
     getPlantById,
+
     hasPlant,
 
-    // ------------------------------------
-    // Unlock
-    // ------------------------------------
+    // ========================================================
+    // UNLOCK
+    // ========================================================
 
     getAvailablePlants,
+
     getUnlockedPlants,
+
     getLockedPlants,
 
-    // ------------------------------------
-    // Filters
-    // ------------------------------------
+    // ========================================================
+    // FILTERS
+    // ========================================================
 
     getPlantsByRegion,
+
     getPlantsByRarity,
 
-    // ------------------------------------
-    // Shop
-    // ------------------------------------
+    // ========================================================
+    // SHOP
+    // ========================================================
 
     getShopPlants,
 
-    // ------------------------------------
-    // Helpers
-    // ------------------------------------
+    // ========================================================
+    // RESOLVE
+    // ========================================================
 
     resolvePlant,
 
+    // ========================================================
+    // DISPLAY
+    // ========================================================
+
     plantEmoji,
+
     plantName,
+
     plantNameVi,
 
+    // ========================================================
+    // STATS
+    // ========================================================
+
     plantGrowth,
+
     plantWater,
 
     plantSellPrice,
+
     plantSeedPrice,
+
     seedPrice,
 
     plantRarity,
+
     plantUnlockLevel,
 
     plantYield,
+
+    randomPlantYield,
+
     plantMutations,
 
     plantRegion,
+
     plantColor,
 
     plantFarmXP,
+
     plantProfileXP,
 
     plantDescription,
 
-    // ------------------------------------
-    // Format
-    // ------------------------------------
+    // ========================================================
+    // FORMAT
+    // ========================================================
 
     formatGrowthTime,
 
     rarityStars,
+
     rarityName,
 
-    // ------------------------------------
-    // Search
-    // ------------------------------------
+    // ========================================================
+    // SEARCH
+    // ========================================================
 
     searchPlants,
 
-    // ------------------------------------
-    // Random
-    // ------------------------------------
+    // ========================================================
+    // RANDOM
+    // ========================================================
 
     randomPlant,
+
     randomAvailablePlant,
+
 };

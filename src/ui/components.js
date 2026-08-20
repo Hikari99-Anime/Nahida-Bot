@@ -1,8 +1,17 @@
-﻿const {
+﻿// ============================================================
+// src/ui/components.js
+// ============================================================
+// 🌱 NAHIDA FARM - DISCORD COMPONENTS
+// ============================================================
+
+const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    StringSelectMenuBuilder
+    StringSelectMenuBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle
 } = require("discord.js");
 
 const {
@@ -27,9 +36,15 @@ function button(
 
     const builder =
         new ButtonBuilder()
-            .setCustomId(customId)
-            .setLabel(label)
-            .setStyle(style);
+            .setCustomId(
+                String(customId)
+            )
+            .setLabel(
+                String(label)
+            )
+            .setStyle(
+                style
+            );
 
     if (emoji) {
         builder.setEmoji(emoji);
@@ -235,7 +250,7 @@ function geneticsButtons() {
 
 
 // ============================================================
-// SHOP REFRESH
+// SHOP REFRESH BUTTON
 // ============================================================
 
 function shopRefreshButton() {
@@ -250,6 +265,72 @@ function shopRefreshButton() {
 
 
 // ============================================================
+// SHOP QUANTITY MODAL
+// ============================================================
+// Interaction handler của bạn đang gọi:
+//
+// shopQuantityModal(plantId)
+//
+// Vì vậy function này bắt buộc phải export.
+// ============================================================
+
+function shopQuantityModal(
+    plantId
+) {
+
+    const id =
+        String(
+            plantId || ""
+        );
+
+    const modal =
+        new ModalBuilder()
+            .setCustomId(
+                `shop_quantity_${id}`
+            )
+            .setTitle(
+                "🛒 Mua hạt giống"
+            );
+
+    const quantityInput =
+        new TextInputBuilder()
+            .setCustomId(
+                "quantity"
+            )
+            .setLabel(
+                "Số lượng muốn mua"
+            )
+            .setPlaceholder(
+                "Nhập số lượng, ví dụ: 10"
+            )
+            .setStyle(
+                TextInputStyle.Short
+            )
+            .setRequired(
+                true
+            )
+            .setMinLength(
+                1
+            )
+            .setMaxLength(
+                3
+            );
+
+    const row =
+        new ActionRowBuilder()
+            .addComponents(
+                quantityInput
+            );
+
+    modal.addComponents(
+        row
+    );
+
+    return modal;
+}
+
+
+// ============================================================
 // PLANT SELECT MENU
 // ============================================================
 
@@ -258,30 +339,34 @@ function plantSelectMenu(
 ) {
 
     const data =
-        getUser(user);
+        getUser(
+            user
+        );
 
     if (!data) {
-        return backButton("home_farm");
+        return backButton(
+            "home_farm"
+        );
     }
 
-    /*
-     * QUAN TRỌNG:
-     *
-     * Không require ../game/plants ở đây.
-     *
-     * Dùng database/plants trực tiếp để tránh:
-     *
-     * components.js
-     *      ↓
-     * game/plants.js
-     *      ↓
-     * components.js
-     *
-     * => circular dependency
-     */
+    // ========================================================
+    // QUAN TRỌNG
+    // ========================================================
+    //
+    // Không dùng:
+    //
+    // require("../database/plants")
+    //
+    // nữa.
+    //
+    // Shop và farm đều phải dùng cùng một plants.js:
+    //
+    // src/game/plants.js
+    //
+    // ========================================================
 
     const plants =
-        require("../database/plants");
+        require("../game/plants");
 
     let available = [];
 
@@ -297,10 +382,18 @@ function plantSelectMenu(
 
         available =
             plants.getAvailablePlants(
-                Number(data.level || 1)
+                Number(
+                    data.level || 1
+                )
             );
 
-    } else if (
+    }
+
+    // --------------------------------------------------------
+    // Fallback
+    // --------------------------------------------------------
+
+    else if (
         typeof plants.getAllPlants ===
         "function"
     ) {
@@ -327,23 +420,26 @@ function plantSelectMenu(
                         }
 
                         return (
-                            Number(data.level || 1) >=
-                            Number(plant.unlockLevel)
+                            Number(
+                                data.level || 1
+                            ) >=
+                            Number(
+                                plant.unlockLevel
+                            )
                         );
                     }
                 );
     }
 
 
-    // --------------------------------------------------------
-    // Fallback nếu database export array
-    // --------------------------------------------------------
-
     if (
-        !Array.isArray(available)
+        !Array.isArray(
+            available
+        )
     ) {
 
         available = [];
+
     }
 
 
@@ -364,8 +460,14 @@ function plantSelectMenu(
     // Không có cây
     // --------------------------------------------------------
 
-    if (!available.length) {
-        return backButton("home_farm");
+    if (
+        !available.length
+    ) {
+
+        return backButton(
+            "home_farm"
+        );
+
     }
 
 
@@ -379,6 +481,7 @@ function plantSelectMenu(
 
                 const name =
                     String(
+                        plant.nameVi ||
                         plant.name ||
                         plant.displayName ||
                         plant.id
@@ -394,16 +497,25 @@ function plantSelectMenu(
 
                     label:
                         `${emoji} ${name}`
-                            .slice(0, 100),
+                            .slice(
+                                0,
+                                100
+                            ),
 
                     value:
-                        String(plant.id),
+                        String(
+                            plant.id
+                        ),
 
                     description:
                         `Chọn ${name}`
-                            .slice(0, 100)
+                            .slice(
+                                0,
+                                100
+                            )
 
                 };
+
             }
         );
 
@@ -454,6 +566,164 @@ function plantSelectMenu(
                 )
 
             )
+
+    ];
+}
+
+
+// ============================================================
+// SHOP SELECT MENU
+// ============================================================
+// Có thể dùng function này nếu handler cần lấy shop menu
+// trực tiếp từ components.js.
+// ============================================================
+
+function shopSelectMenu(
+    user
+) {
+
+    const {
+        getShopPlants
+    } = require("../game/shop");
+
+    const {
+        plantEmoji,
+        plantName,
+        plantSeedPrice
+    } = require("../game/plants");
+
+    const {
+        getItemCount
+    } = require("../game/inventory");
+
+    const plants =
+        getShopPlants(
+            user.id
+        );
+
+    // --------------------------------------------------------
+    // Shop rỗng
+    // --------------------------------------------------------
+
+    if (
+        !plants ||
+        !plants.length
+    ) {
+
+        return [
+
+            new ActionRowBuilder()
+                .addComponents(
+
+                    shopRefreshButton(),
+
+                    button(
+                        "home",
+                        "Trang chủ",
+                        "🏠",
+                        ButtonStyle.Secondary
+                    )
+
+                )
+
+        ];
+    }
+
+
+    // --------------------------------------------------------
+    // Options
+    // --------------------------------------------------------
+
+    const options =
+        plants.map(
+            plant => {
+
+                const price =
+                    plantSeedPrice(
+                        plant
+                    );
+
+                const owned =
+                    getItemCount(
+                        user.id,
+                        plant.id
+                    );
+
+                return {
+
+                    label:
+                        `${plantEmoji(plant)} ${plantName(plant)}`
+                            .slice(
+                                0,
+                                100
+                            ),
+
+                    description:
+                        `${Number(price).toLocaleString()} Mora • Đang có: ${owned}`
+                            .slice(
+                                0,
+                                100
+                            ),
+
+                    value:
+                        String(
+                            plant.id
+                        )
+
+                };
+
+            }
+        );
+
+
+    const menu =
+        new StringSelectMenuBuilder()
+            .setCustomId(
+                "shop_buy"
+            )
+            .setPlaceholder(
+                "🛒 Chọn hạt giống muốn mua..."
+            )
+            .addOptions(
+                options
+            );
+
+
+    return [
+
+        new ActionRowBuilder()
+            .addComponents(
+                menu
+            ),
+
+        new ActionRowBuilder()
+            .addComponents(
+
+                shopRefreshButton(),
+
+                button(
+                    "home_farm",
+                    "Nông trại",
+                    "🌱",
+                    ButtonStyle.Success
+                ),
+
+                button(
+                    "home_inventory",
+                    "Túi đồ",
+                    "🎒",
+                    ButtonStyle.Secondary
+                ),
+
+                button(
+                    "home",
+                    "Trang chủ",
+                    "🏠",
+                    ButtonStyle.Secondary
+                )
+
+            )
+
     ];
 }
 
@@ -481,6 +751,7 @@ function plotSelect(
         return backButton(
             "home_farm"
         );
+
     }
 
 
@@ -520,10 +791,13 @@ function plotSelect(
             customId =
                 `plot_info_${plot.plot_id}`;
 
-        } else {
+        }
+
+        else {
 
             customId =
                 `plant_${plantId}_${plot.plot_id}`;
+
         }
 
 
@@ -539,6 +813,7 @@ function plotSelect(
             )
 
         );
+
     }
 
 
@@ -564,6 +839,7 @@ function plotSelect(
                 )
 
         );
+
     }
 
 
@@ -591,6 +867,7 @@ function plotSelect(
                 )
 
             )
+
     );
 
 
@@ -604,18 +881,19 @@ function plotSelect(
 
 module.exports = {
 
+    // Buttons
     mainButtons,
-
     farmButtons,
-
     backButton,
-
     geneticsButtons,
 
+    // Shop
     shopRefreshButton,
+    shopQuantityModal,
+    shopSelectMenu,
 
+    // Farm
     plantSelectMenu,
-
     plotSelect
 
 };

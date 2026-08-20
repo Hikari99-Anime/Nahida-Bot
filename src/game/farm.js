@@ -5,13 +5,18 @@
 
 const {
     getPlant,
-    getAvailablePlants,
     plantYield,
     plantWater,
     plantFarmXP,
-    plantProfileXP,
-    plantSeedPrice,
+    plantProfileXP
 } = require("./plants");
+
+const {
+    getItemCount,
+    removeItem,
+    addItem
+} = require("./inventory");
+
 
 // ========================================
 // CONSTANTS
@@ -21,6 +26,7 @@ const DEFAULT_SLOTS = 6;
 const DEFAULT_WATER = 100;
 const DEFAULT_MORA = 1000;
 
+
 // ========================================
 // UTILS
 // ========================================
@@ -29,153 +35,301 @@ function now() {
     return Date.now();
 }
 
-function randomInt(min, max) {
-    min = Number(min) || 0;
-    max = Number(max) || min;
+
+function randomInt(
+    min,
+    max
+) {
+
+    min =
+        Number(min) || 0;
+
+    max =
+        Number(max) || min;
+
 
     if (max < min) {
-        [min, max] = [max, min];
+        [
+            min,
+            max
+        ] = [
+            max,
+            min
+        ];
     }
+
 
     return (
         Math.floor(
-            Math.random() * (max - min + 1)
+            Math.random() *
+            (max - min + 1)
         ) + min
     );
 }
 
-function clamp(value, min, max) {
+
+function clamp(
+    value,
+    min,
+    max
+) {
+
     return Math.max(
         min,
-        Math.min(max, value)
+        Math.min(
+            max,
+            value
+        )
     );
 }
+
 
 // ========================================
 // CREATE FARM
 // ========================================
 
-function createFarm(options = {}) {
+function createFarm(
+    options = {}
+) {
+
     const slots =
-        Number(options.slots) ||
+        Number(
+            options.slots
+        ) ||
         DEFAULT_SLOTS;
 
+
     const water =
-        Number(options.water) >= 0
-            ? Number(options.water)
+        Number(
+            options.water
+        ) >= 0
+
+            ? Number(
+                options.water
+            )
+
             : DEFAULT_WATER;
 
+
     const mora =
-        Number(options.mora) >= 0
-            ? Number(options.mora)
+        Number(
+            options.mora
+        ) >= 0
+
+            ? Number(
+                options.mora
+            )
+
             : DEFAULT_MORA;
 
-    return {
-        level: 1,
 
-        xp: 0,
+    return {
+
+        level:
+            1,
+
+        xp:
+            0,
 
         mora,
 
         water,
 
-        maxWater: 100,
+        maxWater:
+            100,
 
-        slots: Array.from(
-            { length: slots },
-            (_, index) => ({
-                id: index,
-                plantId: null,
-                plantedAt: null,
-                readyAt: null,
-                watered: 0,
-                harvested: false,
-            })
-        ),
+        slots:
+            Array.from(
+                {
+                    length:
+                        slots
+                },
 
-        inventory: {},
+                (_, index) => ({
+
+                    id:
+                        index,
+
+                    plantId:
+                        null,
+
+                    plantedAt:
+                        null,
+
+                    readyAt:
+                        null,
+
+                    watered:
+                        0,
+
+                    harvested:
+                        false
+                })
+            ),
+
+        inventory:
+            {},
 
         statistics: {
-            planted: 0,
-            harvested: 0,
-            sold: 0,
-            mutations: 0,
+
+            planted:
+                0,
+
+            harvested:
+                0,
+
+            sold:
+                0,
+
+            mutations:
+                0
         },
 
-        createdAt: now(),
+        createdAt:
+            now(),
 
-        updatedAt: now(),
+        updatedAt:
+            now()
     };
 }
 
+
 // ========================================
-// VALIDATE FARM
+// NORMALIZE FARM
 // ========================================
 
-function normalizeFarm(farm) {
-    if (!farm || typeof farm !== "object") {
+function normalizeFarm(
+    farm
+) {
+
+    if (
+        !farm ||
+        typeof farm !==
+        "object"
+    ) {
+
         return createFarm();
     }
 
-    if (!Array.isArray(farm.slots)) {
+
+    if (
+        !Array.isArray(
+            farm.slots
+        )
+    ) {
+
         farm.slots = [];
     }
 
-    if (farm.slots.length === 0) {
+
+    if (
+        farm.slots.length ===
+        0
+    ) {
+
         farm.slots =
             createFarm().slots;
     }
 
-    if (!farm.inventory) {
+
+    if (
+        !farm.inventory
+    ) {
+
         farm.inventory = {};
     }
 
-    if (!farm.statistics) {
+
+    if (
+        !farm.statistics
+    ) {
+
         farm.statistics = {
-            planted: 0,
-            harvested: 0,
-            sold: 0,
-            mutations: 0,
+
+            planted:
+                0,
+
+            harvested:
+                0,
+
+            sold:
+                0,
+
+            mutations:
+                0
         };
     }
 
+
     farm.level =
-        Number(farm.level) || 1;
+        Number(
+            farm.level
+        ) || 1;
+
 
     farm.xp =
-        Number(farm.xp) || 0;
+        Number(
+            farm.xp
+        ) || 0;
+
 
     farm.mora =
-        Number(farm.mora) || 0;
+        Number(
+            farm.mora
+        ) || 0;
+
 
     farm.water =
-        Number(farm.water) || 0;
+        Number(
+            farm.water
+        ) || 0;
+
 
     farm.maxWater =
-        Number(farm.maxWater) || 100;
+        Number(
+            farm.maxWater
+        ) || 100;
+
 
     return farm;
 }
 
+
 // ========================================
-// LEVEL SYSTEM
+// LEVEL
 // ========================================
 
-function xpRequired(level) {
+function xpRequired(
+    level
+) {
+
     level =
         Math.max(
             1,
             Number(level) || 1
         );
 
+
     return Math.floor(
         100 *
-        Math.pow(level, 1.35)
+        Math.pow(
+            level,
+            1.35
+        )
     );
 }
 
-function addXP(farm, amount) {
-    farm = normalizeFarm(farm);
+
+function addXP(
+    farm,
+    amount
+) {
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     amount =
         Math.max(
@@ -183,135 +337,253 @@ function addXP(farm, amount) {
             Number(amount) || 0
         );
 
+
     farm.xp += amount;
+
 
     let levelUps = 0;
 
+
     while (
         farm.xp >=
-        xpRequired(farm.level)
+        xpRequired(
+            farm.level
+        )
     ) {
+
         farm.xp -=
-            xpRequired(farm.level);
+            xpRequired(
+                farm.level
+            );
 
         farm.level++;
 
         levelUps++;
     }
 
-    farm.updatedAt = now();
+
+    farm.updatedAt =
+        now();
+
 
     return {
+
         amount,
-        level: farm.level,
-        xp: farm.xp,
+
+        level:
+            farm.level,
+
+        xp:
+            farm.xp,
+
         nextXP:
-            xpRequired(farm.level),
-        levelUps,
+            xpRequired(
+                farm.level
+            ),
+
+        levelUps
     };
 }
+
 
 // ========================================
 // GET SLOT
 // ========================================
 
-function getSlot(farm, slotId) {
-    farm = normalizeFarm(farm);
+function getSlot(
+    farm,
+    slotId
+) {
 
-    slotId = Number(slotId);
+    farm =
+        normalizeFarm(
+            farm
+        );
+
+
+    slotId =
+        Number(
+            slotId
+        );
+
 
     if (
-        !Number.isInteger(slotId) ||
+        !Number.isInteger(
+            slotId
+        ) ||
         slotId < 0
     ) {
+
         return null;
     }
 
+
     return (
         farm.slots.find(
-            (slot) =>
-                slot.id === slotId
-        ) || null
+            slot =>
+                Number(
+                    slot.id
+                ) ===
+                slotId
+        ) ||
+        null
     );
 }
+
 
 // ========================================
 // EMPTY SLOTS
 // ========================================
 
-function getEmptySlots(farm) {
-    farm = normalizeFarm(farm);
+function getEmptySlots(
+    farm
+) {
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     return farm.slots.filter(
-        (slot) =>
+        slot =>
             !slot.plantId
     );
 }
 
+
 // ========================================
-// READY SLOTS
+// READY
 // ========================================
 
-function isPlantReady(slot) {
-    if (!slot || !slot.plantId) {
+function isPlantReady(
+    slot
+) {
+
+    if (
+        !slot ||
+        !slot.plantId
+    ) {
+
         return false;
     }
 
-    if (!slot.readyAt) {
+
+    if (
+        !slot.readyAt
+    ) {
+
         return false;
     }
 
-    return now() >=
-        Number(slot.readyAt);
-}
 
-function getReadySlots(farm) {
-    farm = normalizeFarm(farm);
-
-    return farm.slots.filter(
-        (slot) =>
-            isPlantReady(slot)
+    return (
+        now() >=
+        Number(
+            slot.readyAt
+        )
     );
 }
 
+
+function getReadySlots(
+    farm
+) {
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
+
+    return farm.slots.filter(
+        slot =>
+            isPlantReady(
+                slot
+            )
+    );
+}
+
+
 // ========================================
-// PLANT
+// PLANT SEED
 // ========================================
+
+/*
+ * FLOW MỚI:
+ *
+ * inventory:
+ *   5 sweet_flower
+ *
+ * gieo 1:
+ *   inventory:
+ *   4 sweet_flower
+ *
+ * Không trừ Mora ở đây.
+ */
 
 function plantSeed(
     farm,
     slotId,
     plantId
 ) {
-    farm = normalizeFarm(farm);
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     const plant =
-        getPlant(plantId);
+        getPlant(
+            plantId
+        );
+
 
     if (!plant) {
+
         return {
-            success: false,
-            error: "PLANT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "PLANT_NOT_FOUND",
+
             message:
-                "Không tìm thấy loại cây.",
+                "Không tìm thấy loại cây."
         };
     }
 
+
     if (
-        plant.unlockLevel >
-        farm.level
+        Number(
+            plant.unlockLevel || 1
+        ) >
+        Number(
+            farm.level || 1
+        )
     ) {
+
         return {
-            success: false,
-            error: "PLANT_LOCKED",
+
+            success:
+                false,
+
+            error:
+                "PLANT_LOCKED",
+
             message:
                 `Bạn cần level ${plant.unlockLevel} để mở khóa cây này.`,
+
             requiredLevel:
                 plant.unlockLevel,
+
             currentLevel:
-                farm.level,
+                farm.level
         };
     }
+
 
     const slot =
         getSlot(
@@ -319,83 +591,265 @@ function plantSeed(
             slotId
         );
 
+
     if (!slot) {
+
         return {
-            success: false,
-            error: "SLOT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "SLOT_NOT_FOUND",
+
             message:
-                "Không tìm thấy ô đất.",
+                "Không tìm thấy ô đất."
         };
     }
 
-    if (slot.plantId) {
-        return {
-            success: false,
-            error: "SLOT_OCCUPIED",
-            message:
-                "Ô đất này đang có cây.",
-        };
-    }
-
-    const seedPrice =
-        plantSeedPrice(plant);
 
     if (
-        farm.mora <
-        seedPrice
+        slot.plantId
     ) {
+
         return {
-            success: false,
-            error: "NOT_ENOUGH_MORA",
+
+            success:
+                false,
+
+            error:
+                "SLOT_OCCUPIED",
+
             message:
-                "Không đủ Mora để mua hạt giống.",
-            required:
-                seedPrice,
-            current:
-                farm.mora,
+                "Ô đất này đang có cây."
         };
     }
 
-    farm.mora -= seedPrice;
 
-    const plantedAt = now();
+    /*
+     * Kiểm tra hạt giống trong inventory.
+     */
+
+    const seedCount =
+        getItemCount(
+            farm.userId ||
+            null,
+            plant.id
+        );
+
+
+    /*
+     * Nếu farm object không chứa userId,
+     * kiểm tra inventory nội bộ.
+     */
+
+    let hasSeed = false;
+
+
+    if (
+        farm.inventory &&
+        farm.inventory[plant.id]
+    ) {
+
+        const item =
+            farm.inventory[
+                plant.id
+            ];
+
+        if (
+            typeof item ===
+            "number"
+        ) {
+
+            hasSeed =
+                item > 0;
+
+        } else {
+
+            hasSeed =
+                Number(
+                    item?.quantity || 0
+                ) > 0;
+        }
+    }
+
+
+    /*
+     * Một số hệ thống user dùng inventory DB
+     * thay vì farm.inventory.
+     *
+     * Nếu farm có userId thì ưu tiên DB.
+     */
+
+    if (
+        farm.userId
+    ) {
+
+        hasSeed =
+            Number(
+                seedCount || 0
+            ) > 0;
+    }
+
+
+    if (!hasSeed) {
+
+        return {
+
+            success:
+                false,
+
+            error:
+                "NO_SEED",
+
+            message:
+                `Bạn không có hạt giống ${plant.name || plant.id}. Hãy mua trong cửa hàng trước.`
+        };
+    }
+
+
+    /*
+     * Remove seed.
+     */
+
+    if (
+        farm.userId
+    ) {
+
+        const removed =
+            removeItem(
+                farm.userId,
+                plant.id,
+                1
+            );
+
+        if (
+            removed === false
+        ) {
+
+            return {
+
+                success:
+                    false,
+
+                error:
+                    "NO_SEED",
+
+                message:
+                    "Bạn không có hạt giống này."
+            };
+        }
+
+    } else {
+
+        const item =
+            farm.inventory[
+                plant.id
+            ];
+
+        if (
+            typeof item ===
+            "number"
+        ) {
+
+            farm.inventory[
+                plant.id
+            ] =
+                Math.max(
+                    0,
+                    item - 1
+                );
+
+        } else {
+
+            item.quantity =
+                Math.max(
+                    0,
+                    Number(
+                        item.quantity || 0
+                    ) - 1
+                );
+
+
+            if (
+                item.quantity <= 0
+            ) {
+
+                delete farm.inventory[
+                    plant.id
+                ];
+            }
+        }
+    }
+
+
+    const plantedAt =
+        now();
+
+
+    const growthTime =
+        Number(
+            plant.growthTime
+        ) || 60;
+
 
     const readyAt =
         plantedAt +
-        plant.growthTime * 1000;
+        growthTime *
+        1000;
+
 
     slot.plantId =
         plant.id;
 
+
     slot.plantedAt =
         plantedAt;
+
 
     slot.readyAt =
         readyAt;
 
-    slot.watered = 0;
 
-    slot.harvested = false;
+    slot.watered =
+        0;
 
-    farm.statistics.planted++;
 
-    farm.updatedAt = now();
+    slot.harvested =
+        false;
+
+
+    farm.statistics.planted =
+        Number(
+            farm.statistics.planted || 0
+        ) + 1;
+
+
+    farm.updatedAt =
+        now();
+
 
     return {
-        success: true,
+
+        success:
+            true,
 
         slot,
 
         plant,
 
         spent:
-            seedPrice,
+            0,
+
+        seedUsed:
+            1,
 
         plantedAt,
 
-        readyAt,
+        readyAt
     };
 }
+
 
 // ========================================
 // WATER
@@ -405,7 +859,12 @@ function waterPlant(
     farm,
     slotId
 ) {
-    farm = normalizeFarm(farm);
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     const slot =
         getSlot(
@@ -413,72 +872,134 @@ function waterPlant(
             slotId
         );
 
+
     if (!slot) {
+
         return {
-            success: false,
-            error: "SLOT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "SLOT_NOT_FOUND",
+
             message:
-                "Không tìm thấy ô đất.",
+                "Không tìm thấy ô đất."
         };
     }
 
-    if (!slot.plantId) {
+
+    if (
+        !slot.plantId
+    ) {
+
         return {
-            success: false,
-            error: "NO_PLANT",
+
+            success:
+                false,
+
+            error:
+                "NO_PLANT",
+
             message:
-                "Ô đất chưa có cây.",
+                "Ô đất chưa có cây."
         };
     }
 
-    if (isPlantReady(slot)) {
+
+    if (
+        isPlantReady(
+            slot
+        )
+    ) {
+
         return {
-            success: false,
-            error: "ALREADY_READY",
+
+            success:
+                false,
+
+            error:
+                "ALREADY_READY",
+
             message:
-                "Cây đã trưởng thành.",
+                "Cây đã trưởng thành."
         };
     }
+
 
     const plant =
         getPlant(
             slot.plantId
         );
 
+
     if (!plant) {
+
         return {
-            success: false,
-            error: "PLANT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "PLANT_NOT_FOUND",
+
             message:
-                "Dữ liệu cây không tồn tại.",
+                "Dữ liệu cây không tồn tại."
         };
     }
+
 
     const cost =
-        plantWater(plant);
+        Number(
+            plantWater(
+                plant
+            )
+        ) || 0;
 
-    if (farm.water < cost) {
+
+    if (
+        farm.water <
+        cost
+    ) {
+
         return {
-            success: false,
-            error: "NOT_ENOUGH_WATER",
+
+            success:
+                false,
+
+            error:
+                "NOT_ENOUGH_WATER",
+
             message:
                 "Không đủ nước.",
+
             required:
                 cost,
+
             current:
-                farm.water,
+                farm.water
         };
     }
 
-    farm.water -= cost;
+
+    farm.water -=
+        cost;
+
 
     slot.watered =
-        Number(slot.watered || 0) + 1;
+        Number(
+            slot.watered || 0
+        ) + 1;
 
-    farm.updatedAt = now();
+
+    farm.updatedAt =
+        now();
+
 
     return {
-        success: true,
+
+        success:
+            true,
 
         slot,
 
@@ -488,37 +1009,56 @@ function waterPlant(
             cost,
 
         remainingWater:
-            farm.water,
+            farm.water
     };
 }
 
+
 // ========================================
-// REFILL WATER
+// REFILL
 // ========================================
 
 function refillWater(
     farm,
     amount
 ) {
-    farm = normalizeFarm(farm);
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     amount =
-        Number(amount);
+        Number(
+            amount
+        );
+
 
     if (
-        !Number.isFinite(amount) ||
+        !Number.isFinite(
+            amount
+        ) ||
         amount <= 0
     ) {
+
         return {
-            success: false,
-            error: "INVALID_AMOUNT",
+
+            success:
+                false,
+
+            error:
+                "INVALID_AMOUNT",
+
             message:
-                "Số lượng nước không hợp lệ.",
+                "Số lượng nước không hợp lệ."
         };
     }
 
+
     const before =
         farm.water;
+
 
     farm.water =
         clamp(
@@ -527,24 +1067,36 @@ function refillWater(
             farm.maxWater
         );
 
-    farm.updatedAt = now();
+
+    farm.updatedAt =
+        now();
+
 
     return {
-        success: true,
+
+        success:
+            true,
+
         added:
             farm.water - before,
+
         water:
             farm.water,
+
         maxWater:
-            farm.maxWater,
+            farm.maxWater
     };
 }
+
 
 // ========================================
 // MUTATION
 // ========================================
 
-function rollMutation(plant) {
+function rollMutation(
+    plant
+) {
+
     const mutations =
         Array.isArray(
             plant?.mutations
@@ -552,16 +1104,21 @@ function rollMutation(plant) {
             ? plant.mutations
             : [];
 
+
     if (
-        mutations.length === 0
+        mutations.length ===
+        0
     ) {
+
         return null;
     }
+
 
     const gene =
         Number(
             plant.genes?.mutation
         ) || 0;
+
 
     const chance =
         clamp(
@@ -570,12 +1127,20 @@ function rollMutation(plant) {
             25
         );
 
-    const roll =
-        Math.random() * 100;
 
-    if (roll >= chance) {
+    const roll =
+        Math.random() *
+        100;
+
+
+    if (
+        roll >=
+        chance
+    ) {
+
         return null;
     }
+
 
     return mutations[
         Math.floor(
@@ -585,6 +1150,7 @@ function rollMutation(plant) {
     ];
 }
 
+
 // ========================================
 // HARVEST
 // ========================================
@@ -593,7 +1159,12 @@ function harvestPlant(
     farm,
     slotId
 ) {
-    farm = normalizeFarm(farm);
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     const slot =
         getSlot(
@@ -601,25 +1172,47 @@ function harvestPlant(
             slotId
         );
 
+
     if (!slot) {
+
         return {
-            success: false,
-            error: "SLOT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "SLOT_NOT_FOUND",
+
             message:
-                "Không tìm thấy ô đất.",
+                "Không tìm thấy ô đất."
         };
     }
 
-    if (!slot.plantId) {
+
+    if (
+        !slot.plantId
+    ) {
+
         return {
-            success: false,
-            error: "NO_PLANT",
+
+            success:
+                false,
+
+            error:
+                "NO_PLANT",
+
             message:
-                "Ô đất không có cây.",
+                "Ô đất không có cây."
         };
     }
 
-    if (!isPlantReady(slot)) {
+
+    if (
+        !isPlantReady(
+            slot
+        )
+    ) {
+
         const remaining =
             Math.max(
                 0,
@@ -629,35 +1222,55 @@ function harvestPlant(
                             slot.readyAt
                         ) -
                         now()
-                    ) / 1000
+                    ) /
+                    1000
                 )
             );
 
+
         return {
-            success: false,
-            error: "NOT_READY",
+
+            success:
+                false,
+
+            error:
+                "NOT_READY",
+
             message:
                 "Cây chưa trưởng thành.",
-            remaining,
+
+            remaining
         };
     }
+
 
     const plant =
         getPlant(
             slot.plantId
         );
 
+
     if (!plant) {
+
         return {
-            success: false,
-            error: "PLANT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "PLANT_NOT_FOUND",
+
             message:
-                "Không tìm thấy dữ liệu cây.",
+                "Không tìm thấy dữ liệu cây."
         };
     }
 
+
     const yieldData =
-        plantYield(plant);
+        plantYield(
+            plant
+        );
+
 
     let quantity =
         randomInt(
@@ -665,56 +1278,105 @@ function harvestPlant(
             yieldData.max
         );
 
-    // Water bonus
-    const watered =
-        Number(slot.watered) || 0;
 
-    if (watered >= 3) {
+    const watered =
+        Number(
+            slot.watered
+        ) || 0;
+
+
+    if (
+        watered >= 3
+    ) {
+
         quantity++;
     }
 
+
     const mutation =
-        rollMutation(plant);
+        rollMutation(
+            plant
+        );
+
 
     const inventoryKey =
         mutation
             ? `${plant.id}:${mutation}`
             : plant.id;
 
+
+    /*
+     * Nếu có userId:
+     * add trực tiếp vào inventory DB.
+     */
+
     if (
-        !farm.inventory[
-            inventoryKey
-        ]
+        farm.userId
     ) {
+
+        addItem(
+            farm.userId,
+            inventoryKey,
+            quantity
+        );
+
+    } else {
+
+        if (
+            !farm.inventory[
+                inventoryKey
+            ]
+        ) {
+
+            farm.inventory[
+                inventoryKey
+            ] = {
+
+                plantId:
+                    plant.id,
+
+                quantity:
+                    0,
+
+                mutation:
+                    mutation ||
+                    null
+            };
+        }
+
+
         farm.inventory[
             inventoryKey
-        ] = {
-            plantId:
-                plant.id,
-
-            quantity: 0,
-
-            mutation:
-                mutation || null,
-        };
+        ].quantity +=
+            quantity;
     }
 
-    farm.inventory[
-        inventoryKey
-    ].quantity += quantity;
 
     farm.statistics.harvested +=
         quantity;
 
+
     if (mutation) {
+
         farm.statistics.mutations++;
     }
 
+
     const farmXP =
-        plantFarmXP(plant);
+        Number(
+            plantFarmXP(
+                plant
+            )
+        ) || 0;
+
 
     const profileXP =
-        plantProfileXP(plant);
+        Number(
+            plantProfileXP(
+                plant
+            )
+        ) || 0;
+
 
     const xpResult =
         addXP(
@@ -722,7 +1384,9 @@ function harvestPlant(
             farmXP
         );
 
+
     const harvestedPlant = {
+
         plantId:
             plant.id,
 
@@ -738,24 +1402,43 @@ function harvestPlant(
         quantity,
 
         mutation:
-            mutation || null,
+            mutation ||
+            null,
 
         farmXP,
 
-        profileXP,
+        profileXP
     };
 
-    // Reset slot
-    slot.plantId = null;
-    slot.plantedAt = null;
-    slot.readyAt = null;
-    slot.watered = 0;
-    slot.harvested = true;
 
-    farm.updatedAt = now();
+    /*
+     * Reset plot.
+     */
+
+    slot.plantId =
+        null;
+
+    slot.plantedAt =
+        null;
+
+    slot.readyAt =
+        null;
+
+    slot.watered =
+        0;
+
+    slot.harvested =
+        true;
+
+
+    farm.updatedAt =
+        now();
+
 
     return {
-        success: true,
+
+        success:
+            true,
 
         harvested:
             harvestedPlant,
@@ -766,12 +1449,13 @@ function harvestPlant(
         xp:
             xpResult,
 
-        farm,
+        farm
     };
 }
 
+
 // ========================================
-// SELL ONE INVENTORY ITEM
+// SELL ITEM
 // ========================================
 
 function sellItem(
@@ -779,84 +1463,151 @@ function sellItem(
     inventoryKey,
     quantity = 1
 ) {
-    farm = normalizeFarm(farm);
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     quantity =
         Math.floor(
-            Number(quantity) || 0
+            Number(
+                quantity
+            ) || 0
         );
 
-    if (quantity <= 0) {
+
+    if (
+        quantity <= 0
+    ) {
+
         return {
-            success: false,
-            error: "INVALID_QUANTITY",
+
+            success:
+                false,
+
+            error:
+                "INVALID_QUANTITY",
+
             message:
-                "Số lượng bán không hợp lệ.",
+                "Số lượng bán không hợp lệ."
         };
     }
+
 
     const item =
         farm.inventory[
             inventoryKey
         ];
 
+
     if (!item) {
+
         return {
-            success: false,
-            error: "ITEM_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "ITEM_NOT_FOUND",
+
             message:
-                "Không tìm thấy vật phẩm.",
+                "Không tìm thấy vật phẩm."
         };
     }
+
 
     if (
         item.quantity <
         quantity
     ) {
+
         return {
-            success: false,
-            error: "NOT_ENOUGH_ITEMS",
+
+            success:
+                false,
+
+            error:
+                "NOT_ENOUGH_ITEMS",
+
             message:
                 "Không đủ vật phẩm.",
+
             available:
-                item.quantity,
+                item.quantity
         };
     }
+
 
     const plant =
         getPlant(
             item.plantId
         );
 
+
     if (!plant) {
+
         return {
-            success: false,
-            error: "PLANT_NOT_FOUND",
+
+            success:
+                false,
+
+            error:
+                "PLANT_NOT_FOUND",
+
             message:
-                "Không tìm thấy cây.",
+                "Không tìm thấy cây."
         };
     }
+
 
     let price =
         Number(
             plant.sellPrice
         ) || 0;
 
-    // Mutation price bonus
-    if (item.mutation) {
+
+    if (
+        item.mutation
+    ) {
+
         const mutationMultiplier = {
-            golden: 2,
-            shiny: 2,
-            lunar: 2.5,
-            crystal: 3,
-            rainbow: 5,
-            wind: 2,
-            poison: 2,
-            burning: 2.5,
-            electro: 3,
-            giant: 3,
-            divine: 10,
+
+            golden:
+                2,
+
+            shiny:
+                2,
+
+            lunar:
+                2.5,
+
+            crystal:
+                3,
+
+            rainbow:
+                5,
+
+            wind:
+                2,
+
+            poison:
+                2,
+
+            burning:
+                2.5,
+
+            electro:
+                3,
+
+            giant:
+                3,
+
+            divine:
+                10
         };
+
 
         price *=
             mutationMultiplier[
@@ -864,67 +1615,96 @@ function sellItem(
             ] || 1;
     }
 
+
     price =
-        Math.floor(price);
+        Math.floor(
+            price
+        );
+
 
     const total =
-        price * quantity;
+        price *
+        quantity;
+
 
     item.quantity -=
         quantity;
 
+
     if (
-        item.quantity <= 0
+        item.quantity <=
+        0
     ) {
+
         delete farm.inventory[
             inventoryKey
         ];
     }
 
-    farm.mora += total;
+
+    farm.mora +=
+        total;
+
 
     farm.statistics.sold +=
         quantity;
 
-    farm.updatedAt = now();
+
+    farm.updatedAt =
+        now();
+
 
     return {
-        success: true,
+
+        success:
+            true,
 
         sold: {
+
             plantId:
                 item.plantId,
 
             quantity,
 
             mutation:
-                item.mutation || null,
+                item.mutation ||
+                null,
 
             unitPrice:
                 price,
 
-            total,
+            total
         },
 
         mora:
-            farm.mora,
+            farm.mora
     };
 }
+
 
 // ========================================
 // SELL ALL
 // ========================================
 
-function sellAll(farm) {
-    farm = normalizeFarm(farm);
+function sellAll(
+    farm
+) {
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     let totalMora = 0;
     let totalItems = 0;
+
 
     const entries =
         Object.entries(
             farm.inventory
         );
+
 
     for (
         const [
@@ -932,7 +1712,11 @@ function sellAll(farm) {
             item
         ] of entries
     ) {
-        if (!item) continue;
+
+        if (!item) {
+            continue;
+        }
+
 
         const result =
             sellItem(
@@ -941,7 +1725,11 @@ function sellAll(farm) {
                 item.quantity
             );
 
-        if (result.success) {
+
+        if (
+            result.success
+        ) {
+
             totalMora +=
                 result.sold.total;
 
@@ -950,8 +1738,11 @@ function sellAll(farm) {
         }
     }
 
+
     return {
-        success: true,
+
+        success:
+            true,
 
         totalMora,
 
@@ -961,40 +1752,60 @@ function sellAll(farm) {
             farm.mora,
 
         inventory:
-            farm.inventory,
+            farm.inventory
     };
 }
+
 
 // ========================================
 // FARM STATUS
 // ========================================
 
-function getFarmStatus(farm) {
-    farm = normalizeFarm(farm);
+function getFarmStatus(
+    farm
+) {
+
+    farm =
+        normalizeFarm(
+            farm
+        );
+
 
     const slots =
         farm.slots.map(
-            (slot) => {
-                if (!slot.plantId) {
+            slot => {
+
+                if (
+                    !slot.plantId
+                ) {
+
                     return {
+
                         ...slot,
-                        status: "empty",
+
+                        status:
+                            "empty"
                     };
                 }
+
 
                 const plant =
                     getPlant(
                         slot.plantId
                     );
 
+
                 const ready =
                     isPlantReady(
                         slot
                     );
 
+
                 const remaining =
                     ready
+
                         ? 0
+
                         : Math.max(
                             0,
                             Math.ceil(
@@ -1008,7 +1819,9 @@ function getFarmStatus(farm) {
                             )
                         );
 
+
                 return {
+
                     ...slot,
 
                     plant,
@@ -1018,12 +1831,14 @@ function getFarmStatus(farm) {
                             ? "ready"
                             : "growing",
 
-                    remaining,
+                    remaining
                 };
             }
         );
 
+
     return {
+
         level:
             farm.level,
 
@@ -1050,15 +1865,17 @@ function getFarmStatus(farm) {
             farm.inventory,
 
         statistics:
-            farm.statistics,
+            farm.statistics
     };
 }
+
 
 // ========================================
 // EXPORT
 // ========================================
 
 module.exports = {
+
     createFarm,
     normalizeFarm,
 
@@ -1079,5 +1896,5 @@ module.exports = {
     sellItem,
     sellAll,
 
-    getFarmStatus,
+    getFarmStatus
 };

@@ -1,10 +1,24 @@
-﻿const {
+﻿// ============================================================
+// src/handlers/interactionHandler.js
+// ============================================================
+// 🌱 NAHIDA FARM - INTERACTION HANDLER
+// ============================================================
+
+const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
 } = require("discord.js");
 
-const { COLORS, BREED_COST } = require("../config");
+const {
+    COLORS,
+    BREED_COST
+} = require("../config");
+
+
+// ============================================================
+// GAME
+// ============================================================
 
 const {
     getPlant,
@@ -43,6 +57,11 @@ const {
     breedingSessions,
     breedPlants
 } = require("../game/genetics");
+
+
+// ============================================================
+// UI
+// ============================================================
 
 const {
     homeEmbed,
@@ -86,29 +105,34 @@ module.exports = (client) => {
                     interaction.isModalSubmit()
                 ) {
 
+                    // ----------------------------------------------------
+                    // SHOP QUANTITY
+                    // ----------------------------------------------------
+
                     if (
-                        !interaction.customId.startsWith(
+                        interaction.customId.startsWith(
                             "shop_quantity_"
                         )
                     ) {
-                        return;
+
+                        const plantId =
+                            interaction.customId.slice(
+                                "shop_quantity_".length
+                            );
+
+                        const quantity =
+                            interaction.fields.getTextInputValue(
+                                "quantity"
+                            );
+
+                        return buySeeds(
+                            interaction,
+                            plantId,
+                            quantity
+                        );
                     }
 
-                    const plantId =
-                        interaction.customId.slice(
-                            "shop_quantity_".length
-                        );
-
-                    const quantity =
-                        interaction.fields.getTextInputValue(
-                            "quantity"
-                        );
-
-                    return buySeeds(
-                        interaction,
-                        plantId,
-                        quantity
-                    );
+                    return;
                 }
 
 
@@ -121,7 +145,7 @@ module.exports = (client) => {
                 ) {
 
                     // ====================================================
-                    // SHOP
+                    // SHOP BUY
                     // ====================================================
 
                     if (
@@ -130,77 +154,132 @@ module.exports = (client) => {
                     ) {
 
                         const plantId =
-                            interaction.values[0];
+                            String(
+                                interaction.values[0]
+                            );
+
+
+                        // ------------------------------------------------
+                        // DEBUG
+                        // ------------------------------------------------
+
+                        console.log(
+                            "[SHOP] Selected plant:",
+                            plantId
+                        );
+
+
+                        // ------------------------------------------------
+                        // Get plant
+                        // ------------------------------------------------
 
                         const plant =
                             getPlant(
                                 plantId
                             );
 
+
                         if (!plant) {
 
+                            console.log(
+                                "[SHOP] ❌ getPlant failed:",
+                                plantId
+                            );
+
                             return interaction.reply({
+
                                 content:
-                                    "❌ Không tìm thấy hạt giống.",
+                                    `❌ Không tìm thấy hạt giống: \`${plantId}\`.`
+                                    ,
+
                                 ephemeral:
                                     true
                             });
                         }
+
+
+                        // ------------------------------------------------
+                        // Check shop
+                        // ------------------------------------------------
 
                         const shopPlants =
                             getShopPlants(
                                 interaction.user.id
                             );
 
-                        if (
-                            !shopPlants.some(
+
+                        const inShop =
+                            shopPlants.some(
                                 p =>
-                                    p.id === plant.id
-                            )
-                        ) {
+                                    String(
+                                        p.id
+                                    ) ===
+                                    String(
+                                        plant.id
+                                    )
+                            );
+
+
+                        if (!inShop) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Hạt giống này không còn trong shop.",
+
                                 ephemeral:
                                     true
                             });
                         }
 
+
+                        // ------------------------------------------------
+                        // IMPORTANT
+                        //
+                        // Truyền plant.id, KHÔNG truyền object plant.
+                        // ------------------------------------------------
+
                         return interaction.showModal(
                             shopQuantityModal(
-                                plant
+                                plant.id
                             )
                         );
                     }
 
 
                     // ====================================================
-                    // PLANT
+                    // PLANT SELECT
                     // ====================================================
 
                     if (
                         interaction.customId ===
-                        "select_plant"
+                        "plant_select"
                     ) {
 
                         const plantId =
-                            interaction.values[0];
+                            String(
+                                interaction.values[0]
+                            );
+
 
                         const plant =
                             getPlant(
                                 plantId
                             );
 
+
                         if (!plant) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Không tìm thấy cây.",
+
                                 ephemeral:
                                     true
                             });
                         }
+
 
                         const rows =
                             plotSelect(
@@ -208,19 +287,25 @@ module.exports = (client) => {
                                 plant.id
                             );
 
+
                         return interaction.update({
 
                             embeds: [
+
                                 plantDetailEmbed(
                                     interaction.user,
                                     plant
                                 )
+
                             ],
 
                             components:
+                                rows &&
                                 rows.length
                                     ? rows
-                                    : backButton()
+                                    : backButton(
+                                        "home_farm"
+                                    )
                         });
                     }
 
@@ -235,36 +320,51 @@ module.exports = (client) => {
                     ) {
 
                         const parentA =
-                            interaction.values[0];
+                            String(
+                                interaction.values[0]
+                            );
+
 
                         const plant =
                             getPlant(
                                 parentA
                             );
 
+
                         if (!plant) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Không tìm thấy cây.",
+
                                 ephemeral:
                                     true
                             });
                         }
 
+
                         breedingSessions.set(
+
                             `select:${interaction.user.id}`,
+
                             {
-                                parentA,
-                                parentB: null
+                                parentA:
+                                    parentA,
+
+                                parentB:
+                                    null
                             }
+
                         );
+
 
                         const rows =
                             breedParentMenu(
                                 interaction.user.id,
                                 "b"
                             );
+
 
                         return interaction.update({
 
@@ -284,7 +384,9 @@ module.exports = (client) => {
 
                                     color:
                                         COLORS.purple
+
                                 })
+
                             ],
 
                             components:
@@ -304,12 +406,16 @@ module.exports = (client) => {
                     ) {
 
                         const parentB =
-                            interaction.values[0];
+                            String(
+                                interaction.values[0]
+                            );
+
 
                         const session =
                             breedingSessions.get(
                                 `select:${interaction.user.id}`
                             );
+
 
                         if (
                             !session ||
@@ -317,22 +423,27 @@ module.exports = (client) => {
                         ) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Phiên lai đã hết. Hãy bắt đầu lại.",
+
                                 ephemeral:
                                     true
                             });
                         }
+
 
                         const parentA =
                             getPlant(
                                 session.parentA
                             );
 
+
                         const parentBPlant =
                             getPlant(
                                 parentB
                             );
+
 
                         if (
                             !parentA ||
@@ -340,12 +451,15 @@ module.exports = (client) => {
                         ) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Không tìm thấy cây.",
+
                                 ephemeral:
                                     true
                             });
                         }
+
 
                         if (
                             parentA.id ===
@@ -353,12 +467,15 @@ module.exports = (client) => {
                         ) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Cây bố và cây mẹ phải khác nhau.",
+
                                 ephemeral:
                                     true
                             });
                         }
+
 
                         const countA =
                             getItemCount(
@@ -366,11 +483,13 @@ module.exports = (client) => {
                                 parentA.id
                             );
 
+
                         const countB =
                             getItemCount(
                                 interaction.user.id,
                                 parentBPlant.id
                             );
+
 
                         if (
                             countA <= 0 ||
@@ -378,15 +497,20 @@ module.exports = (client) => {
                         ) {
 
                             return interaction.reply({
+
                                 content:
                                     "❌ Bạn không đủ cây để lai.",
+
                                 ephemeral:
                                     true
                             });
                         }
 
+
                         breedingSessions.set(
+
                             `select:${interaction.user.id}`,
+
                             {
                                 parentA:
                                     parentA.id,
@@ -394,7 +518,9 @@ module.exports = (client) => {
                                 parentB:
                                     parentBPlant.id
                             }
+
                         );
+
 
                         return interaction.update({
 
@@ -418,7 +544,9 @@ module.exports = (client) => {
 
                                     color:
                                         COLORS.purple
+
                                 })
+
                             ],
 
                             components:
@@ -440,6 +568,7 @@ module.exports = (client) => {
                     return;
                 }
 
+
                 const id =
                     interaction.customId;
 
@@ -455,13 +584,16 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             homeEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             mainButtons()
+
                     });
                 }
 
@@ -477,9 +609,11 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             profileEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components: [
@@ -528,7 +662,9 @@ module.exports = (client) => {
                                         .setStyle(
                                             ButtonStyle.Secondary
                                         )
+
                                 )
+
                         ]
                     });
                 }
@@ -545,13 +681,16 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             farmEmbedView(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             farmButtons()
+
                     });
                 }
 
@@ -567,13 +706,16 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             inventoryEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             mainButtons()
+
                     });
                 }
 
@@ -589,15 +731,18 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             shopEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             shopSelectMenu(
                                 interaction.user
                             )
+
                     });
                 }
 
@@ -627,13 +772,16 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             geneticsEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             geneticsButtons()
+
                     });
                 }
 
@@ -649,13 +797,16 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             helpEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             mainButtons()
+
                     });
                 }
 
@@ -673,6 +824,7 @@ module.exports = (client) => {
                             interaction.user
                         );
 
+
                     return interaction.update({
 
                         embeds: [
@@ -687,12 +839,15 @@ module.exports = (client) => {
 
                                 description:
                                     "🌱 Chọn giống cây bạn muốn gieo."
+
                             })
+
                         ],
 
                         components:
                             menu ||
                             backButton()
+
                     });
                 }
 
@@ -710,12 +865,14 @@ module.exports = (client) => {
                             interaction.user.id
                         );
 
+
                     const active =
                         plots.filter(
                             p =>
                                 p.plant_id &&
                                 !p.watered
                         );
+
 
                     if (
                         !active.length
@@ -728,11 +885,14 @@ module.exports = (client) => {
 
                             ephemeral:
                                 true
+
                         });
                     }
 
+
                     const row =
                         new ActionRowBuilder();
+
 
                     for (
                         const plot of active
@@ -753,7 +913,9 @@ module.exports = (client) => {
                                 .setStyle(
                                     ButtonStyle.Primary
                                 )
+
                         );
+
 
                         if (
                             row.components.length >=
@@ -762,6 +924,7 @@ module.exports = (client) => {
                             break;
                         }
                     }
+
 
                     return interaction.reply({
 
@@ -777,16 +940,22 @@ module.exports = (client) => {
 
                                 description:
                                     "💧 Chọn ô đất muốn tưới."
+
                             })
+
                         ],
 
                         components: [
+
                             row,
+
                             ...backButton()
+
                         ],
 
                         ephemeral:
                             true
+
                     });
                 }
 
@@ -804,12 +973,14 @@ module.exports = (client) => {
                             interaction.user.id
                         );
 
+
                     const ready =
                         plots.filter(
                             p =>
                                 p.plant_id &&
                                 isReady(p)
                         );
+
 
                     if (
                         !ready.length
@@ -822,11 +993,14 @@ module.exports = (client) => {
 
                             ephemeral:
                                 true
+
                         });
                     }
 
+
                     const row =
                         new ActionRowBuilder();
+
 
                     for (
                         const plot of ready
@@ -847,7 +1021,9 @@ module.exports = (client) => {
                                 .setStyle(
                                     ButtonStyle.Success
                                 )
+
                         );
+
 
                         if (
                             row.components.length >=
@@ -856,6 +1032,7 @@ module.exports = (client) => {
                             break;
                         }
                     }
+
 
                     return interaction.reply({
 
@@ -871,16 +1048,22 @@ module.exports = (client) => {
 
                                 description:
                                     "🌾 Chọn cây bạn muốn thu hoạch."
+
                             })
+
                         ],
 
                         components: [
+
                             row,
+
                             ...backButton()
+
                         ],
 
                         ephemeral:
                             true
+
                     });
                 }
 
@@ -910,13 +1093,16 @@ module.exports = (client) => {
                     return interaction.update({
 
                         embeds: [
+
                             geneticsEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             geneticsButtons()
+
                     });
                 }
 
@@ -934,6 +1120,7 @@ module.exports = (client) => {
                             interaction.user.id
                         );
 
+
                     if (
                         plants.length < 2
                     ) {
@@ -945,14 +1132,17 @@ module.exports = (client) => {
 
                             ephemeral:
                                 true
+
                         });
                     }
+
 
                     const rows =
                         breedParentMenu(
                             interaction.user.id,
                             "a"
                         );
+
 
                     return interaction.update({
 
@@ -972,12 +1162,15 @@ module.exports = (client) => {
 
                                 color:
                                     COLORS.purple
+
                             })
+
                         ],
 
                         components:
                             rows ||
                             backButton()
+
                     });
                 }
 
@@ -995,6 +1188,7 @@ module.exports = (client) => {
                             `select:${interaction.user.id}`
                         );
 
+
                     if (
                         !session ||
                         !session.parentA ||
@@ -1008,12 +1202,15 @@ module.exports = (client) => {
 
                             ephemeral:
                                 true
+
                         });
                     }
+
 
                     breedingSessions.delete(
                         `select:${interaction.user.id}`
                     );
+
 
                     return breedPlants(
                         interaction,
@@ -1035,16 +1232,20 @@ module.exports = (client) => {
                         `select:${interaction.user.id}`
                     );
 
+
                     return interaction.update({
 
                         embeds: [
+
                             geneticsEmbed(
                                 interaction.user
                             )
+
                         ],
 
                         components:
                             geneticsButtons()
+
                     });
                 }
 
@@ -1062,15 +1263,18 @@ module.exports = (client) => {
                     const parts =
                         id.split("_");
 
+
                     const plotId =
                         Number(
                             parts.pop()
                         );
 
+
                     const plantId =
                         parts
                             .slice(1)
                             .join("_");
+
 
                     return plantSeed(
                         interaction,
@@ -1095,6 +1299,7 @@ module.exports = (client) => {
                             id.split("_")[1]
                         );
 
+
                     return waterPlot(
                         interaction,
                         plotId
@@ -1117,18 +1322,22 @@ module.exports = (client) => {
                             id.split("_")[1]
                         );
 
+
                     return harvest(
                         interaction,
                         plotId
                     );
                 }
 
-            } catch (error) {
+            }
+
+            catch (error) {
 
                 console.error(
                     "Interaction error:",
                     error
                 );
+
 
                 try {
 
@@ -1144,9 +1353,12 @@ module.exports = (client) => {
 
                             ephemeral:
                                 true
+
                         });
 
-                    } else {
+                    }
+
+                    else {
 
                         await interaction.reply({
 
@@ -1155,11 +1367,17 @@ module.exports = (client) => {
 
                             ephemeral:
                                 true
+
                         });
+
                     }
 
-                } catch {}
+                }
+
+                catch {}
+
             }
+
         }
     );
 };

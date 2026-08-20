@@ -1,53 +1,14 @@
 ﻿const { db } = require("../db");
 const { now } = require("../utils/time");
+const { MAX_WATER } = require("../config");
 
 // ============================================================
 // WATER CONFIG
 // ============================================================
 
-const MAX_WATER = 200;
-
 // +1 Water mỗi 60 giây
-const WATER_REGEN_MS = 60 * 1000;
-
-
-// ============================================================
-// WATER DATABASE MIGRATION
-// ============================================================
-
-try {
-
-    const columns =
-        db.prepare(`
-            PRAGMA table_info(users)
-        `).all();
-
-    const hasLastWaterAt =
-        columns.some(
-            column =>
-                column.name ===
-                "last_water_at"
-        );
-
-    if (!hasLastWaterAt) {
-
-        db.exec(`
-            ALTER TABLE users
-            ADD COLUMN last_water_at INTEGER DEFAULT 0
-        `);
-
-        console.log(
-            "[USER] ✅ Added users.last_water_at"
-        );
-    }
-
-} catch (error) {
-
-    console.error(
-        "[USER] ❌ Water migration error:",
-        error
-    );
-}
+const WATER_REGEN_MS =
+    60 * 1000;
 
 
 // ============================================================
@@ -59,10 +20,12 @@ function getUser(user) {
     const id =
         typeof user === "string"
             ? user
-            : user.id;
+            : user?.id;
 
     if (!id) {
-        throw new Error("USER_ID_REQUIRED");
+        throw new Error(
+            "USER_ID_REQUIRED"
+        );
     }
 
     let row =
@@ -71,6 +34,10 @@ function getUser(user) {
             FROM users
             WHERE id = ?
         `).get(id);
+
+    // ========================================================
+    // CREATE USER
+    // ========================================================
 
     if (!row) {
 
@@ -91,39 +58,55 @@ function getUser(user) {
             (
                 id,
                 username,
+
                 level,
                 xp,
+
                 mora,
                 luck,
+
                 water,
+                last_water_at,
+
                 farm_level,
                 farm_xp,
+
                 harvest_count,
                 bug_count,
-                last_water_at,
+
                 created_at,
                 updated_at
             )
-            VALUES (
+
+            VALUES
+            (
                 ?,
                 ?,
+
                 1,
                 0,
-                1000,
+
+                2000,
                 0,
-                100,
+
+                200,
+                ?,
+
                 1,
                 25,
+
                 0,
                 0,
-                ?,
+
                 ?,
                 ?
             )
         `).run(
             id,
             username,
+
             timestamp,
+
             timestamp,
             timestamp
         );
@@ -148,7 +131,7 @@ function getUser(user) {
 
 
 // ============================================================
-// WATER SYNC INTERNAL
+// WATER SYNC
 // ============================================================
 
 function syncWaterRow(row) {
@@ -162,7 +145,9 @@ function syncWaterRow(row) {
             0,
             Math.min(
                 MAX_WATER,
-                Number(row.water || 0)
+                Number(
+                    row.water || 0
+                )
             )
         );
 
@@ -175,7 +160,7 @@ function syncWaterRow(row) {
         now();
 
     // ========================================================
-    // Nếu chưa có timestamp
+    // Không có timestamp
     // ========================================================
 
     if (!lastWaterAt) {
@@ -207,15 +192,16 @@ function syncWaterRow(row) {
     }
 
     // ========================================================
-    // Đã full
+    // FULL WATER
     // ========================================================
 
-    if (water >= MAX_WATER) {
+    if (
+        water >= MAX_WATER
+    ) {
 
         water =
             MAX_WATER;
 
-        // Full rồi thì timestamp hiện tại
         lastWaterAt =
             currentTime;
 
@@ -243,7 +229,7 @@ function syncWaterRow(row) {
     }
 
     // ========================================================
-    // TÍNH WATER ĐÃ HỒI
+    // CALCULATE REGEN
     // ========================================================
 
     const elapsed =
@@ -259,8 +245,13 @@ function syncWaterRow(row) {
             WATER_REGEN_MS
         );
 
+    // ========================================================
     // Chưa đủ 1 phút
-    if (regenerated <= 0) {
+    // ========================================================
+
+    if (
+        regenerated <= 0
+    ) {
 
         row.water =
             water;
@@ -274,18 +265,26 @@ function syncWaterRow(row) {
     const oldWater =
         water;
 
+    // ========================================================
+    // ADD WATER
+    // ========================================================
+
     water =
         Math.min(
             MAX_WATER,
-            water + regenerated
+            water +
+            regenerated
         );
 
-    // Giữ lại phần thời gian dư
+    // Giữ phần thời gian dư
     lastWaterAt +=
         regenerated *
         WATER_REGEN_MS;
 
-    // Nếu vừa đạt full
+    // ========================================================
+    // Vừa đạt FULL
+    // ========================================================
+
     if (
         water >= MAX_WATER
     ) {
@@ -297,11 +296,16 @@ function syncWaterRow(row) {
             currentTime;
     }
 
-    // Chỉ update nếu water thực sự thay đổi
+    // ========================================================
+    // UPDATE DATABASE
+    // ========================================================
+
     if (
         water !== oldWater ||
         lastWaterAt !==
-            Number(row.last_water_at || 0)
+            Number(
+                row.last_water_at || 0
+            )
     ) {
 
         db.prepare(`
@@ -333,13 +337,38 @@ function syncWaterRow(row) {
 // UPDATE USER
 // ============================================================
 
+const ALLOWED_USER_FIELDS =
+    new Set([
+
+        "username",
+
+        "level",
+        "xp",
+
+        "mora",
+        "luck",
+
+        "water",
+        "last_water_at",
+
+        "farm_level",
+        "farm_xp",
+
+        "harvest_count",
+        "bug_count"
+
+    ]);
+
+
 function updateUser(
     id,
     fields
 ) {
 
     if (!id) {
-        throw new Error("USER_ID_REQUIRED");
+        throw new Error(
+            "USER_ID_REQUIRED"
+        );
     }
 
     if (
@@ -349,8 +378,21 @@ function updateUser(
         return;
     }
 
+    const safeFields =
+        Object.fromEntries(
+            Object.entries(fields)
+                .filter(
+                    ([key]) =>
+                        ALLOWED_USER_FIELDS.has(
+                            key
+                        )
+                )
+        );
+
     const keys =
-        Object.keys(fields);
+        Object.keys(
+            safeFields
+        );
 
     if (!keys.length) {
         return;
@@ -366,14 +408,21 @@ function updateUser(
 
     db.prepare(`
         UPDATE users
+
         SET
             ${set},
             updated_at = @updated_at
+
         WHERE id = @id
     `).run({
-        ...fields,
-        updated_at: now(),
+
+        ...safeFields,
+
+        updated_at:
+            now(),
+
         id
+
     });
 }
 
@@ -411,9 +460,10 @@ function consumeWater(
     const userId =
         typeof user === "string"
             ? user
-            : user.id;
+            : user?.id;
 
     if (!userId) {
+
         throw new Error(
             "USER_ID_REQUIRED"
         );
@@ -424,17 +474,22 @@ function consumeWater(
             Number(amount) || 0
         );
 
-    if (amount <= 0) {
+    if (
+        amount <= 0
+    ) {
 
         return {
             success: false,
-            reason: "INVALID_AMOUNT",
+
+            reason:
+                "INVALID_AMOUNT",
+
             water:
                 getWater(userId)
         };
     }
 
-    // getUser() tự sync water
+    // getUser() tự sync
     const current =
         getUser(userId);
 
@@ -443,12 +498,18 @@ function consumeWater(
             current.water || 0
         );
 
+    // ========================================================
+    // NOT ENOUGH
+    // ========================================================
+
     if (
         water < amount
     ) {
 
         return {
+
             success: false,
+
             reason:
                 "NOT_ENOUGH_WATER",
 
@@ -456,13 +517,17 @@ function consumeWater(
 
             required:
                 amount
+
         };
     }
 
     const newWater =
         water - amount;
 
-    // Bắt đầu tính regen từ lúc tiêu water
+    // ========================================================
+    // RESET REGEN TIMER
+    // ========================================================
+
     updateUser(
         userId,
         {
@@ -475,6 +540,7 @@ function consumeWater(
     );
 
     return {
+
         success: true,
 
         water:
@@ -482,6 +548,7 @@ function consumeWater(
 
         consumed:
             amount
+
     };
 }
 
@@ -498,9 +565,10 @@ function addWater(
     const userId =
         typeof user === "string"
             ? user
-            : user.id;
+            : user?.id;
 
     if (!userId) {
+
         throw new Error(
             "USER_ID_REQUIRED"
         );
@@ -511,13 +579,20 @@ function addWater(
             Number(amount) || 0
         );
 
-    if (amount <= 0) {
+    if (
+        amount <= 0
+    ) {
 
         return {
+
             success: false,
-            reason: "INVALID_AMOUNT",
+
+            reason:
+                "INVALID_AMOUNT",
+
             water:
                 getWater(userId)
+
         };
     }
 
@@ -547,19 +622,22 @@ function addWater(
     );
 
     return {
+
         success: true,
 
         water:
             newWater,
 
         added:
-            newWater - oldWater
+            newWater -
+            oldWater
+
     };
 }
 
 
 // ============================================================
-// WATER REGEN TIME
+// WATER REGEN REMAINING MS
 // ============================================================
 
 function getWaterRegenRemainingMs(
@@ -574,10 +652,14 @@ function getWaterRegenRemainingMs(
             current.water || 0
         );
 
-    // Đã đầy
+    // ========================================================
+    // FULL
+    // ========================================================
+
     if (
         water >= MAX_WATER
     ) {
+
         return 0;
     }
 
@@ -635,7 +717,9 @@ function formatWater(
     const water =
         getWater(user);
 
-    return `${water}/${MAX_WATER}`;
+    return (
+        `${water}/${MAX_WATER}`
+    );
 }
 
 
@@ -651,19 +735,27 @@ function addMora(
     const userId =
         typeof user === "string"
             ? user
-            : user.id;
+            : user?.id;
+
+    if (!userId) {
+
+        throw new Error(
+            "USER_ID_REQUIRED"
+        );
+    }
 
     amount =
         Math.floor(
             Number(amount) || 0
         );
 
-    if (!userId) {
-        throw new Error("USER_ID_REQUIRED");
-    }
+    if (
+        amount === 0
+    ) {
 
-    if (amount === 0) {
-        return getUser(userId).mora;
+        return getUser(
+            userId
+        ).mora;
     }
 
     const current =
@@ -672,7 +764,9 @@ function addMora(
     const mora =
         Math.max(
             0,
-            Number(current.mora || 0) +
+            Number(
+                current.mora || 0
+            ) +
             amount
         );
 
@@ -705,7 +799,10 @@ function xpRequired(
 
     return Math.floor(
         100 +
-        ((level - 1) * 50)
+        (
+            (level - 1) *
+            50
+        )
     );
 }
 
@@ -722,7 +819,14 @@ function addXP(
     const userId =
         typeof user === "string"
             ? user
-            : user.id;
+            : user?.id;
+
+    if (!userId) {
+
+        throw new Error(
+            "USER_ID_REQUIRED"
+        );
+    }
 
     amount =
         Math.max(
@@ -738,13 +842,18 @@ function addXP(
     let xp =
         Math.max(
             0,
-            Number(current.xp || 0)
-        ) + amount;
+            Number(
+                current.xp || 0
+            )
+        ) +
+        amount;
 
     let level =
         Math.max(
             1,
-            Number(current.level || 1)
+            Number(
+                current.level || 1
+            )
         );
 
     let levelUps = 0;
@@ -770,9 +879,13 @@ function addXP(
     );
 
     return {
+
         level,
+
         xp,
+
         levelUps
+
     };
 }
 
@@ -780,12 +893,12 @@ function addXP(
 // ============================================================
 // ALIAS
 // ============================================================
-// Giữ tương thích với code cũ đang gọi addXp()
 
 function addXp(
     user,
     amount
 ) {
+
     return addXP(
         user,
         amount
@@ -805,7 +918,14 @@ function addFarmXP(
     const userId =
         typeof user === "string"
             ? user
-            : user.id;
+            : user?.id;
+
+    if (!userId) {
+
+        throw new Error(
+            "USER_ID_REQUIRED"
+        );
+    }
 
     amount =
         Math.max(
@@ -821,13 +941,18 @@ function addFarmXP(
     let farmXP =
         Math.max(
             0,
-            Number(current.farm_xp || 0)
-        ) + amount;
+            Number(
+                current.farm_xp || 0
+            )
+        ) +
+        amount;
 
     let farmLevel =
         Math.max(
             1,
-            Number(current.farm_level || 1)
+            Number(
+                current.farm_level || 1
+            )
         );
 
     while (
@@ -844,14 +969,20 @@ function addFarmXP(
     updateUser(
         userId,
         {
-            farm_xp: farmXP,
-            farm_level: farmLevel
+            farm_xp:
+                farmXP,
+
+            farm_level:
+                farmLevel
         }
     );
 
     return {
+
         farmLevel,
+
         farmXP
+
     };
 }
 
@@ -869,11 +1000,14 @@ module.exports = {
     // water
     MAX_WATER,
     WATER_REGEN_MS,
+
     getWater,
     consumeWater,
     addWater,
+
     getWaterRegenRemainingMs,
     getWaterRegenRemainingSeconds,
+
     formatWater,
 
     // mora
@@ -886,4 +1020,5 @@ module.exports = {
 
     // farm xp
     addFarmXP
+
 };

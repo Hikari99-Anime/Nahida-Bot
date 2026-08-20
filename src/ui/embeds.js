@@ -1,7 +1,8 @@
 ﻿const { EmbedBuilder } = require("discord.js");
 
-const plantDatabase =
-    require("../database/plants");
+// ============================================================
+// CONFIG
+// ============================================================
 
 const {
     COLORS,
@@ -9,35 +10,102 @@ const {
     BREED_COST
 } = require("../config");
 
+// ============================================================
+// TIME
+// ============================================================
+
 const {
     unixSeconds,
     formatTime
 } = require("../utils/time");
+
+// ============================================================
+// USER
+// ============================================================
 
 const {
     getUser,
     xpRequired
 } = require("../game/user");
 
+// ============================================================
+// INVENTORY
+// ============================================================
+
 const {
     getInventory
 } = require("../game/inventory");
+
+// ============================================================
+// PLOTS
+// ============================================================
 
 const {
     getPlots,
     isReady
 } = require("../game/plots");
 
+// ============================================================
+// PLANTS
+// ============================================================
+
 const {
-    isHybridPlant,
     getPlant,
     plantName,
+    plantNameVi,
     plantEmoji,
     plantGrowth,
-    plantWaterCost,
+    plantWater,
     plantSellPrice,
-    getSeedPrice
+    plantSeedPrice,
+    plantRarity,
+    plantYield,
+    plantMutations,
+    plantRegion,
+    plantColor,
+    plantFarmXP,
+    plantProfileXP,
+    rarityStars,
+    rarityName
 } = require("../game/plants");
+
+
+// ============================================================
+// SAFE NUMBER
+// ============================================================
+
+function safeNumber(value, fallback = 0) {
+    const number = Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : fallback;
+}
+
+
+// ============================================================
+// MORA FORMAT
+// ============================================================
+
+function formatMora(value) {
+    return safeNumber(value)
+        .toLocaleString();
+}
+
+
+// ============================================================
+// WATER
+// ============================================================
+
+function getWater(data) {
+    return Math.max(
+        0,
+        Math.min(
+            200,
+            safeNumber(data?.water, 0)
+        )
+    );
+}
 
 
 // ============================================================
@@ -54,21 +122,44 @@ function farmEmbed({
     const data =
         getUser(user);
 
+    const mora =
+        safeNumber(
+            data?.mora,
+            0
+        );
+
+    const water =
+        getWater(data);
+
+    const level =
+        Math.max(
+            1,
+            safeNumber(
+                data?.level,
+                1
+            )
+        );
+
     return new EmbedBuilder()
+
         .setColor(
             color ||
             COLORS.green
         )
+
         .setTitle(
-            `🌱 ${title}`
+            `🌱 ${title || "Nahida Farm"}`
         )
+
         .setDescription(
-            description
+            description || ""
         )
+
         .setFooter({
             text:
-                `${user.username} • Lv.${data.level} • 💰 ${data.mora.toLocaleString()} Mora`
+                `${user.username} • Lv.${level} • 💰 ${formatMora(mora)} Mora • 💧 ${water}/200`
         })
+
         .setTimestamp();
 }
 
@@ -77,16 +168,32 @@ function farmEmbed({
 // HOME
 // ============================================================
 
-function homeEmbed(
-    user
-) {
+function homeEmbed(user) {
 
     const data =
         getUser(user);
 
+    const level =
+        Math.max(
+            1,
+            safeNumber(
+                data?.level,
+                1
+            )
+        );
+
+    const mora =
+        safeNumber(
+            data?.mora,
+            0
+        );
+
+    const water =
+        getWater(data);
+
     const text = [
 
-        `\`${user.username}\` — **Lv.${data.level}**`,
+        `\`${user.username}\` — **Lv.${level}**`,
 
         "",
 
@@ -96,9 +203,9 @@ function homeEmbed(
 
         "",
 
-        `💰 ${data.mora.toLocaleString()} Mora`,
+        `💰 **${formatMora(mora)} Mora**`,
 
-        `💧 ${data.water}/200 Nước`,
+        `💧 **${water}/200 Nước**`,
 
         "",
 
@@ -122,6 +229,7 @@ function homeEmbed(
 
         color:
             COLORS.green
+
     });
 }
 
@@ -130,12 +238,73 @@ function homeEmbed(
 // PROFILE
 // ============================================================
 
-function profileEmbed(
-    user
-) {
+function profileEmbed(user) {
 
     const data =
         getUser(user);
+
+    const level =
+        Math.max(
+            1,
+            safeNumber(
+                data?.level,
+                1
+            )
+        );
+
+    const xp =
+        Math.max(
+            0,
+            safeNumber(
+                data?.xp,
+                0
+            )
+        );
+
+    const farmLevel =
+        Math.max(
+            1,
+            safeNumber(
+                data?.farm_level,
+                1
+            )
+        );
+
+    const farmXP =
+        Math.max(
+            0,
+            safeNumber(
+                data?.farm_xp,
+                0
+            )
+        );
+
+    const mora =
+        safeNumber(
+            data?.mora,
+            0
+        );
+
+    const water =
+        getWater(data);
+
+    const harvestCount =
+        Math.max(
+            0,
+            safeNumber(
+                data?.harvest_count,
+                0
+            )
+        );
+
+    const bugCount =
+        Math.max(
+            0,
+            safeNumber(
+                data?.bug_count,
+                0
+            )
+        );
 
     const text = [
 
@@ -143,25 +312,25 @@ function profileEmbed(
 
         "",
 
-        `⭐ Level: **${data.level}**`,
+        `⭐ Level: **${level}**`,
 
-        `✨ EXP: **${data.xp}/${xpRequired(data.level)}**`,
+        `✨ EXP: **${xp}/${xpRequired(level)}**`,
 
-        `🌱 Farm Level: **${data.farm_level}**`,
+        `🌱 Farm Level: **${farmLevel}**`,
 
-        `🌾 Farm EXP: **${data.farm_xp}/${data.farm_level * 100}**`,
-
-        "",
-
-        `💰 Mora: **${data.mora.toLocaleString()}**`,
-
-        `💧 Nước: **${data.water}/200**`,
+        `🌾 Farm EXP: **${farmXP}/${farmLevel * 100}**`,
 
         "",
 
-        `🌾 Đã thu hoạch: **${data.harvest_count}**`,
+        `💰 Mora: **${formatMora(mora)}**`,
 
-        `🐛 Đã bắt sâu: **${data.bug_count}**`
+        `💧 Nước: **${water}/200**`,
+
+        "",
+
+        `🌾 Đã thu hoạch: **${harvestCount}**`,
+
+        `🐛 Đã bắt sâu: **${bugCount}**`
 
     ].join("\n");
 
@@ -177,6 +346,7 @@ function profileEmbed(
 
         color:
             COLORS.purple
+
     });
 }
 
@@ -185,18 +355,19 @@ function profileEmbed(
 // INVENTORY
 // ============================================================
 
-function inventoryEmbed(
-    user
-) {
+function inventoryEmbed(user) {
 
     const items =
         getInventory(
             user.id
         );
 
+    const data =
+        getUser(user);
+
     const lines = [
 
-        `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+        `\`${user.username}\` — **Lv.${safeNumber(data.level, 1)}**`,
 
         "",
 
@@ -206,9 +377,7 @@ function inventoryEmbed(
 
     ];
 
-    if (
-        !items.length
-    ) {
+    if (!items || !items.length) {
 
         lines.push(
             "> 🎒 Túi đồ đang trống."
@@ -216,9 +385,11 @@ function inventoryEmbed(
 
     } else {
 
-        for (
-            const item of items
-        ) {
+        for (const item of items) {
+
+            if (!item) {
+                continue;
+            }
 
             const plant =
                 getPlant(
@@ -229,10 +400,20 @@ function inventoryEmbed(
                 continue;
             }
 
+            const quantity =
+                Math.max(
+                    0,
+                    safeNumber(
+                        item.quantity,
+                        0
+                    )
+                );
+
             lines.push(
-                `${plantEmoji(plant)} **${plantName(plant)}** ×${item.quantity}`
+                `${plantEmoji(plant)} **${plantName(plant)}** ×${quantity}`
             );
         }
+
     }
 
     return farmEmbed({
@@ -247,6 +428,7 @@ function inventoryEmbed(
 
         color:
             COLORS.gray
+
     });
 }
 
@@ -260,104 +442,259 @@ function plantDetailEmbed(
     plant
 ) {
 
-    const genes =
-        isHybridPlant(plant.id)
+    if (!plant) {
 
-            ? {
+        return farmEmbed({
 
-                growth:
-                    plant.growth_gene,
+            user,
 
-                yield:
-                    plant.yield_gene,
+            title:
+                "Cây Không Tồn Tại",
 
-                water:
-                    plant.water_gene,
+            description:
+                "❌ Không tìm thấy dữ liệu cây.",
 
-                rarity:
-                    plant.rarity_gene,
+            color:
+                COLORS.red
 
-                mutation:
-                    plant.mutation_gene
+        });
+    }
 
-            }
+    // --------------------------------------------------------
+    // RESOLVE PLANT
+    // --------------------------------------------------------
 
-            : (
+    const resolved =
+        typeof plant === "string"
+            ? getPlant(plant)
+            : plant;
 
-                typeof plantDatabase.getGenes ===
-                "function"
+    if (!resolved) {
 
-                    ? plantDatabase.getGenes(
-                        plant.id
-                    )
+        return farmEmbed({
 
-                    : null
-            );
+            user,
+
+            title:
+                "Cây Không Tồn Tại",
+
+            description:
+                "❌ Không tìm thấy dữ liệu cây.",
+
+            color:
+                COLORS.red
+
+        });
+    }
+
+    plant =
+        resolved;
+
+    // --------------------------------------------------------
+    // BASIC
+    // --------------------------------------------------------
+
+    const id =
+        String(
+            plant.id || "unknown"
+        );
+
+    const name =
+        plantName(plant);
+
+    const nameVi =
+        plantNameVi(plant);
+
+    const emoji =
+        plantEmoji(plant);
+
+    const region =
+        plantRegion(plant);
+
+    const rarity =
+        plantRarity(plant);
+
+    const growth =
+        plantGrowth(plant);
+
+    const water =
+        plantWater(plant);
+
+    const sellPrice =
+        plantSellPrice(plant);
+
+    const seedPrice =
+        plantSeedPrice(plant);
+
+    const yieldData =
+        plantYield(plant);
+
+    const mutations =
+        plantMutations(plant);
+
+    const farmXP =
+        plantFarmXP(plant);
+
+    const profileXP =
+        plantProfileXP(plant);
+
+    // --------------------------------------------------------
+    // DESCRIPTION
+    // --------------------------------------------------------
 
     const lines = [];
 
     lines.push(
-        `\`${plant.name || plant.id}\``
+        `\`${id}\``
     );
 
     if (
-        plant.nameVi ||
-        plant.name_vi
+        nameVi &&
+        nameVi !== name
     ) {
 
         lines.push(
-            `**${plantName(plant)}**`
+            `**${nameVi}**`
         );
+
+    } else {
+
+        lines.push(
+            `**${name}**`
+        );
+
     }
 
     lines.push("");
 
+    // --------------------------------------------------------
+    // INFO
+    // --------------------------------------------------------
+
     lines.push(
-        `${plantEmoji(plant)} **${plant.region || "Hybrid"}**`
+        `${emoji} **${region}**`
     );
 
     lines.push(
-        `⭐ Rarity: **${plant.rarity ?? plant.rarity_gene ?? "?"}**`
+        `${rarityStars(rarity)} **${rarityName(rarity)}**`
     );
 
     lines.push("");
+
+    // --------------------------------------------------------
+    // FARM
+    // --------------------------------------------------------
 
     lines.push(
         "🌱 **CANH TÁC**"
     );
 
     lines.push(
-        `> ⏱️ Sinh trưởng: ${formatTime(plantGrowth(plant))}`
+        `> ⏱️ Sinh trưởng: **${formatTime(growth)}**`
     );
 
     lines.push(
-        `> 🌾 Sản lượng: ${plant.yield_min ?? plant.yield?.min ?? plant.yield ?? 1}–${plant.yield_max ?? plant.yield?.max ?? plant.yield ?? 1}`
+        `> 🌾 Sản lượng: **${yieldData.min}–${yieldData.max}**`
     );
 
     lines.push(
-        `> 💧 Nước: ${plantWaterCost(plant)}`
+        `> 💧 Nước: **${water}**`
     );
 
     lines.push(
-        `> 💰 Bán: ${plantSellPrice(plant)} Mora`
+        `> 💰 Bán: **${formatMora(sellPrice)} Mora**`
     );
 
     lines.push(
-        `> 🌱 Giá hạt: ${getSeedPrice(plant).toLocaleString()} Mora`
+        `> 🌱 Giá hạt: **${formatMora(seedPrice)} Mora**`
     );
+
+    // --------------------------------------------------------
+    // XP
+    // --------------------------------------------------------
 
     if (
-        plant.mutation_name
+        farmXP > 0 ||
+        profileXP > 0
     ) {
 
         lines.push("");
 
         lines.push(
-            `✨ Mutation: **${plant.mutation_emoji || "✨"} ${plant.mutation_name}**`
+            "✨ **KINH NGHIỆM**"
+        );
+
+        lines.push(
+            `> 🌾 Farm XP: **${farmXP}**`
+        );
+
+        lines.push(
+            `> ⭐ Profile XP: **${profileXP}**`
         );
     }
 
-    if (genes) {
+    // --------------------------------------------------------
+    // MUTATIONS
+    // --------------------------------------------------------
+
+    if (
+        mutations.length
+    ) {
+
+        lines.push("");
+
+        lines.push(
+            "✨ **MUTATIONS**"
+        );
+
+        for (
+            const mutation of mutations
+        ) {
+
+            if (
+                typeof mutation === "string"
+            ) {
+
+                lines.push(
+                    `> ✨ ${mutation}`
+                );
+
+                continue;
+            }
+
+            if (
+                mutation &&
+                typeof mutation === "object"
+            ) {
+
+                const mutationName =
+                    mutation.name ||
+                    mutation.nameVi ||
+                    mutation.id ||
+                    "Mutation";
+
+                const mutationEmoji =
+                    mutation.emoji ||
+                    "✨";
+
+                lines.push(
+                    `> ${mutationEmoji} **${mutationName}**`
+                );
+            }
+        }
+    }
+
+    // --------------------------------------------------------
+    // GENES
+    // --------------------------------------------------------
+
+    if (
+        plant.genes &&
+        typeof plant.genes === "object"
+    ) {
+
+        const genes =
+            plant.genes;
 
         lines.push("");
 
@@ -366,23 +703,42 @@ function plantDetailEmbed(
         );
 
         lines.push(
-            `> Growth ${Number(genes.growth).toFixed(2)}`
+            `> Growth: **${safeNumber(genes.growth).toFixed(2)}**`
         );
 
         lines.push(
-            `> Yield ${Number(genes.yield).toFixed(2)}`
+            `> Yield: **${safeNumber(genes.yield).toFixed(2)}**`
         );
 
         lines.push(
-            `> Water ${Number(genes.water).toFixed(2)}`
+            `> Water: **${safeNumber(genes.water).toFixed(2)}**`
         );
 
         lines.push(
-            `> Rarity ${Number(genes.rarity).toFixed(2)}`
+            `> Rarity: **${safeNumber(genes.rarity).toFixed(2)}**`
         );
 
         lines.push(
-            `> Mutation ${Number(genes.mutation).toFixed(2)}`
+            `> Mutation: **${safeNumber(genes.mutation).toFixed(2)}**`
+        );
+    }
+
+    // --------------------------------------------------------
+    // DESCRIPTION
+    // --------------------------------------------------------
+
+    if (
+        plant.description
+    ) {
+
+        lines.push("");
+
+        lines.push(
+            "📖 **MÔ TẢ**"
+        );
+
+        lines.push(
+            `> ${plant.description}`
         );
     }
 
@@ -391,13 +747,14 @@ function plantDetailEmbed(
         user,
 
         title:
-            `${plantEmoji(plant)} ${plantName(plant)}`,
+            `${emoji} ${name}`,
 
         description:
             lines.join("\n"),
 
         color:
             COLORS.purple
+
     });
 }
 
@@ -406,18 +763,28 @@ function plantDetailEmbed(
 // FARM EMBED VIEW
 // ============================================================
 
-function farmEmbedView(
-    user
-) {
+function farmEmbedView(user) {
 
     const plots =
         getPlots(
             user.id
         );
 
+    const data =
+        getUser(user);
+
+    const level =
+        Math.max(
+            1,
+            safeNumber(
+                data?.level,
+                1
+            )
+        );
+
     const lines = [
 
-        `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+        `\`${user.username}\` — **Lv.${level}**`,
 
         "",
 
@@ -427,88 +794,119 @@ function farmEmbedView(
 
     ];
 
-    for (
-        const plot of plots
+    if (
+        !plots ||
+        !plots.length
     ) {
 
-        // ----------------------------------------------------
-        // EMPTY PLOT
-        // ----------------------------------------------------
+        lines.push(
+            "> 🟫 Chưa có ô đất nào."
+        );
 
-        if (
-            !plot.plant_id
+    } else {
+
+        for (
+            const plot of plots
         ) {
 
-            lines.push(
-                `🟫 **Ô ${plot.plot_id}** — Trống`
-            );
+            // ------------------------------------------------
+            // EMPTY PLOT
+            // ------------------------------------------------
 
-            continue;
-        }
+            if (
+                !plot.plant_id
+            ) {
 
-        const plant =
-            getPlant(
-                plot.plant_id
-            );
-
-        // ----------------------------------------------------
-        // INVALID PLANT
-        // ----------------------------------------------------
-
-        if (!plant) {
-
-            lines.push(
-                `🟫 **Ô ${plot.plot_id}** — Dữ liệu cây lỗi`
-            );
-
-            continue;
-        }
-
-        // ----------------------------------------------------
-        // READY
-        // ----------------------------------------------------
-
-        if (
-            isReady(plot)
-        ) {
-
-            lines.push(
-
-                `🌾 **Ô ${plot.plot_id}** — ` +
-                `${plantEmoji(plant)} **${plantName(plant)}** — ` +
-                "**SẴN SÀNG THU HOẠCH!**"
-
-            );
-
-        } else {
-
-            const finish =
-                unixSeconds(
-                    plot.finish_at
+                lines.push(
+                    `🟫 **Ô ${plot.plot_id}** — Trống`
                 );
 
+                continue;
+            }
+
+            // ------------------------------------------------
+            // GET PLANT
+            // ------------------------------------------------
+
+            const plant =
+                getPlant(
+                    plot.plant_id
+                );
+
+            // ------------------------------------------------
+            // INVALID PLANT
+            // ------------------------------------------------
+
+            if (!plant) {
+
+                lines.push(
+                    `🟫 **Ô ${plot.plot_id}** — Dữ liệu cây lỗi`
+                );
+
+                continue;
+            }
+
+            // ------------------------------------------------
+            // READY
+            // ------------------------------------------------
+
+            if (
+                isReady(plot)
+            ) {
+
+                lines.push(
+
+                    `🌾 **Ô ${plot.plot_id}** — ` +
+                    `${plantEmoji(plant)} **${plantName(plant)}** — ` +
+                    "**SẴN SÀNG THU HOẠCH!**"
+
+                );
+
+            } else {
+
+                const finish =
+                    unixSeconds(
+                        plot.finish_at
+                    );
+
+                lines.push(
+
+                    `🌱 **Ô ${plot.plot_id}** — ` +
+                    `${plantEmoji(plant)} **${plantName(plant)}** — ` +
+                    `<t:${finish}:R>`
+
+                );
+            }
+
+            // ------------------------------------------------
+            // WATER STATUS
+            // ------------------------------------------------
+
             lines.push(
 
-                `🌱 **Ô ${plot.plot_id}** — ` +
-                `${plantEmoji(plant)} **${plantName(plant)}** — ` +
-                `<t:${finish}:R>`
+                `> 💧 ${
+                    plot.watered
+                        ? "Đã tưới"
+                        : "Chưa tưới"
+                }`
 
             );
+
+            // ------------------------------------------------
+            // OPTIONAL MUTATION
+            // ------------------------------------------------
+
+            if (
+                plot.mutation
+            ) {
+
+                lines.push(
+                    `> ✨ Mutation: **${plot.mutation}**`
+                );
+            }
+
         }
 
-        // ----------------------------------------------------
-        // WATER STATUS
-        // ----------------------------------------------------
-
-        lines.push(
-
-            `> 💧 ${
-                plot.watered
-                    ? "Đã tưới"
-                    : "Chưa tưới"
-            }`
-
-        );
     }
 
     return farmEmbed({
@@ -523,6 +921,7 @@ function farmEmbedView(
 
         color:
             COLORS.green
+
     });
 }
 
@@ -531,13 +930,11 @@ function farmEmbedView(
 // HELP
 // ============================================================
 
-function helpEmbed(
-    user
-) {
+function helpEmbed(user) {
 
     const text = [
 
-        `\`${user.username}\` — **Lv.${getUser(user).level}**`,
+        `\`${user.username}\` — **Lv.${safeNumber(getUser(user).level, 1)}**`,
 
         "",
 
@@ -569,7 +966,7 @@ function helpEmbed(
 
         "> Sức chứa tối đa: **200 nước**.",
 
-        "> Nước sẽ hồi đầy sau **30 phút**.",
+        "> Nước sẽ tự hồi theo thời gian.",
 
         "> Không thể vượt quá **200 nước**.",
 
@@ -577,13 +974,13 @@ function helpEmbed(
 
         "🛒 **CỬA HÀNG**",
 
-        "> Shop có **5 loại hạt** riêng cho từng người.",
+        "> Shop có các loại hạt riêng cho từng người.",
 
-        "> Shop tự đổi sau **30 phút**.",
+        "> Shop tự đổi sau một khoảng thời gian.",
 
-        "> Có **3 lần đổi shop miễn phí/ngày**.",
+        "> Có lượt đổi shop miễn phí mỗi ngày.",
 
-        `> Sau 3 lần: **${SHOP_REFRESH_COST} Mora/lần**.`,
+        `> Sau lượt miễn phí: **${formatMora(SHOP_REFRESH_COST)} Mora/lần**.`,
 
         "> Chọn hạt → nhập số lượng muốn mua.",
 
@@ -591,7 +988,7 @@ function helpEmbed(
 
         "🧬 **LAI TẠO**",
 
-        `> Chi phí: **${BREED_COST} Mora/lần**.`,
+        `> Chi phí: **${formatMora(BREED_COST)} Mora/lần**.`,
 
         "> Chọn cây bố → chọn cây mẹ.",
 
@@ -619,6 +1016,7 @@ function helpEmbed(
 
         color:
             COLORS.water
+
     });
 }
 
